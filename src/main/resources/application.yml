@@ -1,4 +1,3 @@
 spring:
-  data:
-    mongodb:
-      uri: mongodb://root:root1@120.79.145.235:27017/starrysea
+  profiles:
+    active: dev

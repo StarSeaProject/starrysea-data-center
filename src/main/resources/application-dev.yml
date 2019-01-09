@@ -1,0 +1,6 @@
+logging: 
+  config: classpath:logback-dev.xml
+spring:
+  data:
+    mongodb:
+      uri: mongodb://root:root1@120.79.145.235:27017/starrysea
