@@ -2,23 +2,25 @@ package top.starrysea.hateoas;
 
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.RequestMethod;
+
 public class Link {
 
 	private String href;
-	private HttpMethod method;
+	private RequestMethod method;
 	private Map<String, Object> template;
 
 	public Link(String href) {
 		this.href = href;
-		this.method = HttpMethod.GET;
+		this.method = RequestMethod.GET;
 	}
 
-	public Link(String href, HttpMethod method) {
+	public Link(String href, RequestMethod method) {
 		this.href = href;
 		this.method = method;
 	}
 
-	public Link(String href, HttpMethod method, Map<String, Object> template) {
+	public Link(String href, RequestMethod method, Map<String, Object> template) {
 		this.href = href;
 		this.method = method;
 		this.template = template;
@@ -28,7 +30,7 @@ public class Link {
 		return href;
 	}
 
-	public HttpMethod getMethod() {
+	public RequestMethod getMethod() {
 		return method;
 	}
 

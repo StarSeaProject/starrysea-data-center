@@ -40,9 +40,9 @@ public class LinkBinding implements InitializingBean {
 							url = url.replaceAll("\\{" + entry.getKey() + "\\}", (String) entry.getValue());
 						}
 					}
-					link = new Link(url, HttpMethod.valueOf(requestMethod.toString()), template);
+					link = new Link(url, requestMethod, template);
 				} else {
-					link = new Link(url, HttpMethod.valueOf(requestMethod.toString()));
+					link = new Link(url, requestMethod);
 				}
 				return link;
 			}
