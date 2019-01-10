@@ -3,10 +3,10 @@ package top.starrysea.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
-import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Mono;
 import top.starrysea.dto.Most;
 import top.starrysea.repository.MostRepository;
@@ -15,10 +15,8 @@ import top.starrysea.service.ISearchService;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
-import java.time.LocalTime;
 import java.util.regex.Pattern;
 
 @Service("normalSearchService")
@@ -26,6 +24,10 @@ public class NormalSearchService implements ISearchService {
     private static WatchService watchService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
+    @Value("${starrysea.split.input}")
+    private String strInput;
+    @Value("${starrysea.split.output}")
+    private String strOutput;
 
     @PostConstruct
     private void init() {
@@ -61,6 +63,7 @@ public class NormalSearchService implements ISearchService {
     }
 
     private class SplitDialog implements Runnable {
+
         private String fileName;
         private StringBuilder item;
         private String dateNow = "";
@@ -69,13 +72,23 @@ public class NormalSearchService implements ISearchService {
         public void run() {
             try {
                 watchService = FileSystems.getDefault().newWatchService();
-                Path path = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX + "chatHistory/raw/placeholder.txt").getParentFile().toPath();
-                //placeholder.txt是为了方便寻找路径设的文件,下同
+                File inputDir = new File(strInput);
+                if (!inputDir.exists()) {
+                    inputDir.mkdirs();
+                    logger.info(strInput + " 目录已创建");
+                }
+                File outputDir = new File(strOutput);
+                if (!outputDir.exists()) {
+                    outputDir.mkdirs();
+                    logger.info(strOutput + " 目录已创建");
+                }
+                logger.info("现可将聊天记录文件放入"+strInput+"/中,处理完成后将输出至"+strOutput+"/");
+                Path path = inputDir.toPath();
                 path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
                 WatchKey key;
                 while ((key = watchService.take()) != null) {
                     for (WatchEvent<?> event : key.pollEvents()) {
-                        logger.info(LocalTime.now() + " " + "检测到文件变化: " + event.context().toString() + " " + event.kind().toString());
+                        logger.info("检测到文件变化: " + event.context().toString() + " " + event.kind().toString());
                         split(event.context().toString());
                     }
                     key.reset();
@@ -89,7 +102,7 @@ public class NormalSearchService implements ISearchService {
             this.fileName = fileName;
             item = new StringBuilder();
             try {
-                File file = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX + "chatHistory/raw/" + fileName);
+                File file = new File(strInput + "/"+fileName);
                 Files.lines(file.toPath()).forEach(s -> {
                     s = s.replace("\ufeff", "");
                     //处理UTF-8 BOM
@@ -97,7 +110,7 @@ public class NormalSearchService implements ISearchService {
                 });
                 execStr();
                 //将最后的聊天记录送出
-                logger.info("文件已写入至" + ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX + "chatHistory/result/placeholder.txt").getParentFile().getPath() + "\\" + fileName + "\\");
+                logger.info("分割好的文件已写入至" + strOutput + "/" + fileName + "/");
             } catch (FileSystemException e) {
                 if (!e.getMessage().contains(fileName + ": 另一个程序正在使用此文件，进程无法访问。")) {
                     logger.error(e.getMessage(), e);
@@ -147,30 +160,25 @@ public class NormalSearchService implements ISearchService {
             String year = str.substring(0, 4);
             String month = str.substring(5, 7);
             String date = str.substring(0, 10);
-            try {
-                String strRoot = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX + "chatHistory/result/placeholder.txt").getParentFile().getPath();
-                String strDirectory = strRoot + "/" + fileName + "/" + year + "/" + month;
-                String strFile = strDirectory + "/" + date + ".txt";
-                directory = new File(strDirectory);
-                //按年份和月份创建目录
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
-                fileToWrite = new File(strFile);
-                //在相应目录下建立文件
-                if (!fileToWrite.exists()) {
-                    try {
-                        fileToWrite.createNewFile();
-                    } catch (IOException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                }
+            String strDirectory = strOutput + "/" + fileName + "/" + year + "/" + month;
+            String strFile = strDirectory + "/" + date + ".txt";
+            directory = new File(strDirectory);
+            //按年份和月份创建目录
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            fileToWrite = new File(strFile);
+            //在相应目录下建立文件
+            if (!fileToWrite.exists()) {
                 try {
-                    Files.write(Paths.get(strFile), str.getBytes());
+                    fileToWrite.createNewFile();
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
                 }
-            } catch (FileNotFoundException e) {
+            }
+            try {
+                Files.write(Paths.get(strFile), str.getBytes());
+            } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
         }
