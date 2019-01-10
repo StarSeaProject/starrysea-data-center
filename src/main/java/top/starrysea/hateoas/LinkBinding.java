@@ -47,7 +47,7 @@ public class LinkBinding implements InitializingBean {
 				return link;
 			}
 		}
-		throw new RuntimeException("没有找到" + clazz.getName() + "类的" + method + "方法");
+		throw new NullPointerException("没有找到" + clazz.getName() + "类的" + method + "方法");
 	}
 
 	@Override
