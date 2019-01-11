@@ -2,13 +2,13 @@ package top.starrysea.mapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,23 +30,15 @@ public class DateMapper extends Mapper {
 	private void split(String fileName) {
 		this.fileName = fileName;
 		item = new StringBuilder();
-		try {
-			File file = new File(inputPath + "/" + fileName);
-			Files.lines(file.toPath()).forEach(s -> {
-				s = s.replace("\ufeff", "");
-				// 处理UTF-8 BOM
-				execStr(s);
-			});
-			execStr();
-			// 将最后的聊天记录送出
-			logger.info("分割好的文件已写入至" + outputPath + "/" + fileName + "/");
-		} catch (FileSystemException e) {
-			if (!e.getMessage().contains(fileName + ": 另一个程序正在使用此文件，进程无法访问。")) {
-				logger.error(e.getMessage(), e);
-			}
+		File file = new File(inputPath, fileName);
+		try (Stream<String> stream = Files.lines(file.toPath())) {
+			stream.forEach(s -> execStr(s.replace("\ufeff", "")));
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
+		execStr();
+		// 将最后的聊天记录送出
+		logger.info("分割好的文件已写入至{1}/{2}/", outputPath, fileName);
 	}
 
 	private void execStr(String str) {
@@ -100,7 +92,9 @@ public class DateMapper extends Mapper {
 		// 在相应目录下建立文件
 		if (!fileToWrite.exists()) {
 			try {
-				fileToWrite.createNewFile();
+				if (!fileToWrite.createNewFile()) {
+					logger.info("文件夹已经存在");
+				}
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -114,7 +108,7 @@ public class DateMapper extends Mapper {
 
 	@Override
 	protected void mapReduceFinish(List<Future<?>> futures) {
-
+		// map、reduce结束后的回调,这里还没写
 	}
 
 }

@@ -2,7 +2,6 @@ package top.starrysea.mapreduce;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
@@ -25,7 +24,6 @@ public abstract class Mapper implements Runnable {
 	protected String inputPath;
 	protected String outputPath;
 	private List<Reducer<?>> reducers;
-	private static WatchService watchService;
 	protected MostRepository mostRepository;
 
 	public void setInputPath(String inputPath) {
@@ -50,19 +48,18 @@ public abstract class Mapper implements Runnable {
 
 	@Override
 	public void run() {
-		try {
-			watchService = FileSystems.getDefault().newWatchService();
+		try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
 			File inputDir = new File(inputPath);
 			if (!inputDir.exists()) {
 				inputDir.mkdirs();
-				logger.info(inputPath + " 目录已创建");
+				logger.info("{1} 目录已创建", inputPath);
 			}
 			File outputDir = new File(outputPath);
 			if (!outputDir.exists()) {
 				outputDir.mkdirs();
-				logger.info(outputPath + " 目录已创建");
+				logger.info("{1} 目录已创建", outputPath);
 			}
-			logger.info("现可将聊天记录文件放入" + inputPath + "/中,处理完成后将输出至" + outputPath + "/");
+			logger.info("现可将聊天记录文件放入{1}/中,处理完成后将输出至{2}/", inputPath, outputPath);
 			Path path = inputDir.toPath();
 			path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 			WatchKey key;
@@ -77,7 +74,7 @@ public abstract class Mapper implements Runnable {
 						updated = true;
 						continue;
 					}
-					logger.info("检测到文件变化: " + event.context().toString() + " " + event.kind().toString());
+					logger.info("检测到文件变化: {1} {2}", event.context().toString(), event.kind().toString());
 					updated = false;
 					map(event);
 					CountDownLatch countDownLatch = new CountDownLatch(reducers.size());
@@ -86,13 +83,7 @@ public abstract class Mapper implements Runnable {
 						reducer.setCountDownLatch(countDownLatch);
 						return StarryseaMapreduceManager.runCallableTask(reducer);
 					}).collect(Collectors.toList());
-					try {
-						countDownLatch.await();
-						mapReduceFinish(futures);
-					} catch (InterruptedException e) {
-						logger.error(e.getMessage(), e);
-						Thread.currentThread().interrupt();
-					}
+					waitForFinish(countDownLatch, futures);
 				}
 				key.reset();
 			}
@@ -100,12 +91,16 @@ public abstract class Mapper implements Runnable {
 			logger.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-		} catch (ClosedWatchServiceException e) {
-			try {
-				watchService.close();
-			} catch (IOException e1) {
-				logger.error(e1.getMessage(), e1);
-			}
+		}
+	}
+
+	private void waitForFinish(CountDownLatch countDownLatch, List<Future<?>> futures) {
+		try {
+			countDownLatch.await();
+			mapReduceFinish(futures);
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
+			Thread.currentThread().interrupt();
 		}
 	}
 
