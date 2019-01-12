@@ -38,7 +38,7 @@ public class DateMapper extends Mapper {
 		}
 		execStr();
 		// 将最后的聊天记录送出
-		logger.info("分割好的文件已写入至{1}/{2}/", outputPath, fileName);
+		logger.info("分割好的文件已写入至{}/{}/", outputPath, fileName);
 	}
 
 	private void execStr(String str) {

@@ -6,13 +6,14 @@ import java.util.concurrent.CountDownLatch;
 public abstract class Reducer<T> implements Callable<T> {
 
 	protected String inputPath;
-	protected String outputPath;
 	private CountDownLatch countDownLatch;
+	private boolean isFinish = false;
 
 	@Override
-	public T call() {
+	public final T call() {
 		T result = reduce();
-		countDownLatch.countDown();
+		if (isFinish)
+			throw new IllegalStateException("没有调用finish()方法,请确保reducer的最后要调用");
 		return result;
 	}
 
@@ -24,16 +25,13 @@ public abstract class Reducer<T> implements Callable<T> {
 		this.inputPath = inputPath;
 	}
 
-	public String getOutputPath() {
-		return outputPath;
-	}
-
-	public void setOutputPath(String outputPath) {
-		this.outputPath = outputPath;
-	}
-
 	public void setCountDownLatch(CountDownLatch countDownLatch) {
 		this.countDownLatch = countDownLatch;
+	}
+
+	protected final void finish() {
+		isFinish = true;
+		countDownLatch.countDown();
 	}
 
 	protected abstract T reduce();
