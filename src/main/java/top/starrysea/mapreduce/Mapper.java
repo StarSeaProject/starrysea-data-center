@@ -44,8 +44,9 @@ public abstract class Mapper implements Runnable {
 		return reducers;
 	}
 
-	public void setRepository(ReactiveMongoRepository<?, ?> repository) {
+	public Mapper setRepository(ReactiveMongoRepository<?, ?> repository) {
 		this.repository = repository;
+		return this;
 	}
 
 	public void setRunReducerTask(Function<Callable<?>, Future<?>> runReducerTask) {

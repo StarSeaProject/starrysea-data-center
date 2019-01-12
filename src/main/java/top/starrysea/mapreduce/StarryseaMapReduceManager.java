@@ -23,21 +23,13 @@ public class StarryseaMapReduceManager implements InitializingBean {
 	private ThreadPoolTaskExecutor threadPool;
 	private List<MapperAndReduce> mapperAndReduces;
 
+	@Value("${starrysea.split.input}")
 	private String inputPath;
+	@Value("${starrysea.split.output}")
 	private String outputPath;
 
 	@Autowired
 	private MostRepository mostRepository;
-
-	@Value("${starrysea.split.input}")
-	public void setInputPath(String inputPath) {
-		this.inputPath = inputPath;
-	}
-
-	@Value("${starrysea.split.output}")
-	public void setOutputPath(String outputPath) {
-		this.outputPath = outputPath;
-	}
 
 	@PostConstruct
 	private void init() {
@@ -51,11 +43,8 @@ public class StarryseaMapReduceManager implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Mapper dateMapper = new DateMapper();
-		dateMapper.setRepository(mostRepository);
-		Reducer<Integer> dateReducer = new DateReducer();
-		this.register(dateMapper, dateReducer);
-		// this.run();
+		this.register(new DateMapper().setRepository(mostRepository), new DateReducer());
+		this.run();
 	}
 
 	private StarryseaMapReduceManager register(Mapper mapper, Reducer<?>... reducers) {
@@ -67,10 +56,7 @@ public class StarryseaMapReduceManager implements InitializingBean {
 	}
 
 	private void run() {
-		mapperAndReduces.stream().forEach(mapperAndReduce -> {
-			Mapper mapper = mapperAndReduce.getMapper();
-			threadPool.execute(mapper);
-		});
+		mapperAndReduces.stream().forEach(mapperAndReduce -> threadPool.execute(mapperAndReduce.getMapper()));
 	}
 
 	private Future<?> runCallableTask(Callable<?> task) {
