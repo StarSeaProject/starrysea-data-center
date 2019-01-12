@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import top.starrysea.repository.MostRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 public abstract class Mapper implements Runnable {
 
@@ -24,7 +23,7 @@ public abstract class Mapper implements Runnable {
 	protected String inputPath;
 	protected String outputPath;
 	private List<Reducer<?>> reducers;
-	protected MostRepository mostRepository;
+	protected ReactiveMongoRepository<?, ?> repository;
 
 	public void setInputPath(String inputPath) {
 		this.inputPath = inputPath;
@@ -42,8 +41,8 @@ public abstract class Mapper implements Runnable {
 		return reducers;
 	}
 
-	public void setMostRepository(MostRepository mostRepository) {
-		this.mostRepository = mostRepository;
+	public void setRepository(ReactiveMongoRepository<?, ?> repository) {
+		this.repository = repository;
 	}
 
 	@Override
@@ -57,9 +56,9 @@ public abstract class Mapper implements Runnable {
 			File outputDir = new File(outputPath);
 			if (!outputDir.exists()) {
 				outputDir.mkdirs();
-				logger.info("{1} 目录已创建", outputPath);
+				logger.info("{} 目录已创建", outputPath);
 			}
-			logger.info("现可将聊天记录文件放入{1}/中,处理完成后将输出至{2}/", inputPath, outputPath);
+			logger.info("现可将聊天记录文件放入{}/中,处理完成后将输出至{}/", inputPath, outputPath);
 			Path path = inputDir.toPath();
 			path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 			WatchKey key;
@@ -74,7 +73,7 @@ public abstract class Mapper implements Runnable {
 						updated = true;
 						continue;
 					}
-					logger.info("检测到文件变化: {1} {2}", event.context().toString(), event.kind().toString());
+					logger.info("检测到文件变化: {} {}", event.context().toString(), event.kind().toString());
 					updated = false;
 					map(event);
 					CountDownLatch countDownLatch = new CountDownLatch(reducers.size());

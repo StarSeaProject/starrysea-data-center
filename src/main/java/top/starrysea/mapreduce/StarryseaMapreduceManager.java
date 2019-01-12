@@ -49,10 +49,10 @@ public class StarryseaMapreduceManager implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Mapper dateMapper = new DateMapper();
-		dateMapper.setMostRepository(mostRepository);
+		dateMapper.setRepository(mostRepository);
 		Reducer<Integer> dateReducer = new DateReducer();
 		StarryseaMapreduceManager.register(dateMapper, dateReducer);
-		// StarryseaMapreduceManager.run();
+		StarryseaMapreduceManager.run();
 	}
 
 	public static void register(Mapper mapper, Reducer<?>... reducers) {
