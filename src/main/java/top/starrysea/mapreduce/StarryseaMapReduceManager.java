@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,28 +18,29 @@ import top.starrysea.reducer.DateReducer;
 import top.starrysea.repository.MostRepository;
 
 @Component
-public class StarryseaMapreduceManager implements InitializingBean {
+public class StarryseaMapReduceManager implements InitializingBean {
 
-	private static ThreadPoolTaskExecutor threadPool;
-	private static List<MapperAndReduce> mapperAndReduces;
+	private ThreadPoolTaskExecutor threadPool;
+	private List<MapperAndReduce> mapperAndReduces;
 
-	private static String inputPath;
-	private static String outputPath;
+	private String inputPath;
+	private String outputPath;
 
 	@Autowired
 	private MostRepository mostRepository;
 
 	@Value("${starrysea.split.input}")
 	public void setInputPath(String inputPath) {
-		StarryseaMapreduceManager.inputPath = inputPath;
+		this.inputPath = inputPath;
 	}
 
 	@Value("${starrysea.split.output}")
 	public void setOutputPath(String outputPath) {
-		StarryseaMapreduceManager.outputPath = outputPath;
+		this.outputPath = outputPath;
 	}
 
-	static {
+	@PostConstruct
+	private void init() {
 		mapperAndReduces = new ArrayList<>();
 		threadPool = new ThreadPoolTaskExecutor();
 		threadPool.setCorePoolSize(Runtime.getRuntime().availableProcessors());
@@ -51,24 +54,26 @@ public class StarryseaMapreduceManager implements InitializingBean {
 		Mapper dateMapper = new DateMapper();
 		dateMapper.setRepository(mostRepository);
 		Reducer<Integer> dateReducer = new DateReducer();
-		StarryseaMapreduceManager.register(dateMapper, dateReducer);
-		StarryseaMapreduceManager.run();
+		this.register(dateMapper, dateReducer);
+		// this.run();
 	}
 
-	public static void register(Mapper mapper, Reducer<?>... reducers) {
+	private StarryseaMapReduceManager register(Mapper mapper, Reducer<?>... reducers) {
 		mapper.setInputPath(inputPath);
 		mapper.setOutputPath(outputPath);
+		mapper.setRunReducerTask(this::runCallableTask);
 		mapperAndReduces.add(MapperAndReduce.of(mapper, reducers));
+		return this;
 	}
 
-	public static void run() {
+	private void run() {
 		mapperAndReduces.stream().forEach(mapperAndReduce -> {
 			Mapper mapper = mapperAndReduce.getMapper();
 			threadPool.execute(mapper);
 		});
 	}
 
-	public static Future<?> runCallableTask(Callable<?> task) {
+	private Future<?> runCallableTask(Callable<?> task) {
 		return threadPool.submit(task);
 	}
 

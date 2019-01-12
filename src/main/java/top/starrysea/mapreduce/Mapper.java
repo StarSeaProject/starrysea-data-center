@@ -9,8 +9,10 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ public abstract class Mapper implements Runnable {
 	protected String outputPath;
 	private List<Reducer<?>> reducers;
 	protected ReactiveMongoRepository<?, ?> repository;
+	private Function<Callable<?>, Future<?>> runReducerTask;
 
 	public void setInputPath(String inputPath) {
 		this.inputPath = inputPath;
@@ -43,6 +46,10 @@ public abstract class Mapper implements Runnable {
 
 	public void setRepository(ReactiveMongoRepository<?, ?> repository) {
 		this.repository = repository;
+	}
+
+	public void setRunReducerTask(Function<Callable<?>, Future<?>> runReducerTask) {
+		this.runReducerTask = runReducerTask;
 	}
 
 	@Override
@@ -80,7 +87,7 @@ public abstract class Mapper implements Runnable {
 					List<Future<?>> futures = reducers.stream().map(reducer -> {
 						reducer.setInputPath(outputPath);
 						reducer.setCountDownLatch(countDownLatch);
-						return StarryseaMapreduceManager.runCallableTask(reducer);
+						return runReducerTask.apply(reducer);
 					}).collect(Collectors.toList());
 					waitForFinish(countDownLatch, futures);
 				}
