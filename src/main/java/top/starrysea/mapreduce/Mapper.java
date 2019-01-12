@@ -88,6 +88,7 @@ public abstract class Mapper implements Runnable {
 					List<Future<?>> futures = reducers.stream().map(reducer -> {
 						reducer.setInputPath(outputPath);
 						reducer.setCountDownLatch(countDownLatch);
+						reducer.setFileName(event.context().toString());
 						return runReducerTask.apply(reducer);
 					}).collect(Collectors.toList());
 					waitForFinish(countDownLatch, futures);
