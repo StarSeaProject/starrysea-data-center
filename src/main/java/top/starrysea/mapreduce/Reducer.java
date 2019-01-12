@@ -1,22 +1,19 @@
 package top.starrysea.mapreduce;
 
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
+import java.util.function.Function;
 
-public abstract class Reducer<T> implements Callable<T> {
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+
+public abstract class Reducer implements Runnable {
 
 	protected String inputPath;
-	private CountDownLatch countDownLatch;
-	private boolean isFinish = false;
 	private String fileName;
+	protected ReactiveMongoRepository<?, ?> repository;
+	protected Function<Runnable, Void> managerThreadPool;
 
 	@Override
-	public final T call() {
-		T result = (T) reduce();
-		if (isFinish)
-			throw new IllegalStateException("没有调用finish()方法,请确保reducer的最后要调用");
-		return result;
+	public final void run() {
+		reduce();
 	}
 
 	public String getInputPath() {
@@ -27,10 +24,6 @@ public abstract class Reducer<T> implements Callable<T> {
 		this.inputPath = inputPath;
 	}
 
-	public void setCountDownLatch(CountDownLatch countDownLatch) {
-		this.countDownLatch = countDownLatch;
-	}
-
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
@@ -39,10 +32,14 @@ public abstract class Reducer<T> implements Callable<T> {
 		return fileName;
 	}
 
-	protected final void finish() {
-		isFinish = true;
-		countDownLatch.countDown();
+	public Reducer setRepository(ReactiveMongoRepository<?, ?> repository) {
+		this.repository = repository;
+		return this;
 	}
 
-	protected abstract TreeMap<String, Integer> reduce();
+	public void setManagerThreadPool(Function<Runnable, Void> managerThreadPool) {
+		this.managerThreadPool = managerThreadPool;
+	}
+
+	protected abstract void reduce();
 }

@@ -2,8 +2,6 @@ package top.starrysea.mapreduce;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 
@@ -43,14 +41,14 @@ public class StarryseaMapReduceManager implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.register(new DateMapper().setRepository(mostRepository), new DateReducer());
+		this.register(new DateMapper(), new DateReducer().setRepository(mostRepository));
 		this.run();
 	}
 
-	private StarryseaMapReduceManager register(Mapper mapper, Reducer<?>... reducers) {
+	private StarryseaMapReduceManager register(Mapper mapper, Reducer... reducers) {
 		mapper.setInputPath(inputPath);
 		mapper.setOutputPath(outputPath);
-		mapper.setRunReducerTask(this::runCallableTask);
+		mapper.setManagerThreadPool(this::runCallableTask);
 		mapperAndReduces.add(MapperAndReduce.of(mapper, reducers));
 		return this;
 	}
@@ -59,8 +57,9 @@ public class StarryseaMapReduceManager implements InitializingBean {
 		mapperAndReduces.stream().forEach(mapperAndReduce -> threadPool.execute(mapperAndReduce.getMapper()));
 	}
 
-	private Future<?> runCallableTask(Callable<?> task) {
-		return threadPool.submit(task);
+	private Void runCallableTask(Runnable task) {
+		threadPool.execute(task);
+		return null;
 	}
 
 }
