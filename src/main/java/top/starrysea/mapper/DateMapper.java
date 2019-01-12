@@ -18,7 +18,7 @@ import top.starrysea.mapreduce.Mapper;
 public class DateMapper extends Mapper {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private String fileNameWithoutExtension;
+	private String fileName;
 	private StringBuilder item;
 	private String dateNow = "";
 
@@ -28,7 +28,7 @@ public class DateMapper extends Mapper {
 	}
 
 	private void split(String fileName) {
-		this.fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf("."));
+		this.fileName = fileName;
 		item = new StringBuilder();
 		File file = new File(inputPath, fileName);
 		try (Stream<String> stream = Files.lines(file.toPath())) {
@@ -38,7 +38,7 @@ public class DateMapper extends Mapper {
 		}
 		execStr();
 		// 将最后的聊天记录送出
-		logger.info("分割好的文件已写入至{1}/{2}/", outputPath, fileNameWithoutExtension);
+		logger.info("分割好的文件已写入至{1}/{2}/", outputPath, fileName);
 	}
 
 	private void execStr(String str) {
@@ -81,7 +81,7 @@ public class DateMapper extends Mapper {
 		String year = str.substring(0, 4);
 		String month = str.substring(5, 7);
 		String date = str.substring(0, 10);
-		String strDirectory = outputPath + "/" + fileNameWithoutExtension + "/" + year + "/" + month;
+		String strDirectory = outputPath + "/" + fileName + "/" + year + "/" + month;
 		String strFile = strDirectory + "/" + date + ".txt";
 		directory = new File(strDirectory);
 		// 按年份和月份创建目录

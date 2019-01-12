@@ -3,7 +3,6 @@
 /.settings
 .factorypath
 gradle/
-out/
 
 # Compiled class file
 *.class

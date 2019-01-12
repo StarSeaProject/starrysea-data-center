@@ -2,7 +2,6 @@ package top.starrysea.mapreduce;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -51,7 +50,7 @@ public class StarryseaMapreduceManager implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		Mapper dateMapper = new DateMapper();
 		dateMapper.setMostRepository(mostRepository);
-		Reducer<TreeMap<String, Integer>> dateReducer = new DateReducer();
+		Reducer<Integer> dateReducer = new DateReducer();
 		StarryseaMapreduceManager.register(dateMapper, dateReducer);
 		// StarryseaMapreduceManager.run();
 	}
