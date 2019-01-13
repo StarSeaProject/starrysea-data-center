@@ -48,7 +48,7 @@ public class StarryseaMapReduceManager implements InitializingBean {
 	private StarryseaMapReduceManager register(Mapper mapper, Reducer... reducers) {
 		mapper.setInputPath(inputPath);
 		mapper.setOutputPath(outputPath);
-		mapper.setManagerThreadPool(this::runCallableTask);
+		mapper.setManagerThreadPool(this::executeTask);
 		mapperAndReduces.add(MapperAndReduce.of(mapper, reducers));
 		return this;
 	}
@@ -57,7 +57,7 @@ public class StarryseaMapReduceManager implements InitializingBean {
 		mapperAndReduces.stream().forEach(mapperAndReduce -> threadPool.execute(mapperAndReduce.getMapper()));
 	}
 
-	private Void runCallableTask(Runnable task) {
+	private Void executeTask(Runnable task) {
 		threadPool.execute(task);
 		return null;
 	}
