@@ -29,10 +29,9 @@ public class DateReducer extends Reducer {
 		chatCount = new TreeMap<>();
 		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf("."));
 		analyze(inputPath + "/" + fileNameWithoutExtension);
-		// return chatCount;
 	}
 
-	void analyze(String fileDirectory) {
+	private void analyze(String fileDirectory) {
 		ArrayList<File> files = new ArrayList<>();
 		File rootDir = new File(fileDirectory);
 		File[] years = rootDir.listFiles();
@@ -47,7 +46,7 @@ public class DateReducer extends Reducer {
 			}
 		}
 		CountDownLatch countDownLatch = new CountDownLatch(files.size());
-		files.forEach(f -> threadPool.execute(new ChatCount(f, countDownLatch)));
+		files.forEach(f -> managerThreadPool.apply(new ChatCount(f, countDownLatch)));
 		try {
 			countDownLatch.await();
 			logger.info("对每月发言数的分析结束.");
@@ -55,7 +54,7 @@ public class DateReducer extends Reducer {
 				logger.info(entry.getKey() + " " + entry.getValue());
 			}
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -90,14 +89,12 @@ public class DateReducer extends Reducer {
 							count.getAndIncrement();
 					});
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error(e.getMessage(), e);
 				}
 			});
 			chatCount.put(date, count.intValue());
 			// logger.info(date + " " + count);
 			countDownLatch.countDown();
 		}
-
 	}
-
 }

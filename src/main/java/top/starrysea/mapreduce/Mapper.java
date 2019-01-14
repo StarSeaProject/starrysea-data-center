@@ -84,6 +84,7 @@ public abstract class Mapper implements Runnable {
 					reducers.stream().forEach(reducer -> {
 						reducer.setInputPath(outputPath);
 						reducer.setFileName(event.context().toString());
+						reducer.setManagerThreadPool(managerThreadPool);
 						managerThreadPool.apply(reducer);
 					});
 				}
