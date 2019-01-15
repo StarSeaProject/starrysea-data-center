@@ -8,15 +8,12 @@ import top.starrysea.mapreduce.Reducer;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
 public class DateReducer extends Reducer {
-	private TreeMap<String, Long> chatCount;
+	private Map<String, Long> chatCount;
 	private ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -26,7 +23,7 @@ public class DateReducer extends Reducer {
 		threadPool.setMaxPoolSize(10);
 		threadPool.setQueueCapacity(25);
 		threadPool.initialize();
-		chatCount = new TreeMap<>();
+		chatCount = new HashMap<>();
 		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf("."));
 		analyze(inputPath + "/" + fileNameWithoutExtension);
 	}
