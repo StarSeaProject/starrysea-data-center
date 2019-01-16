@@ -9,11 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
 public class DateReducer extends Reducer {
-	private Map<String, Long> chatCount;
+	private ConcurrentHashMap<String, Long> chatCount;
 	private ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -23,7 +24,7 @@ public class DateReducer extends Reducer {
 		threadPool.setMaxPoolSize(10);
 		threadPool.setQueueCapacity(25);
 		threadPool.initialize();
-		chatCount = new HashMap<>();
+		chatCount = new ConcurrentHashMap<>();
 		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf("."));
 		analyze(inputPath + "/" + fileNameWithoutExtension);
 	}
@@ -66,27 +67,28 @@ public class DateReducer extends Reducer {
 			this.countDownLatch = countDownLatch;
 		}
 
-        @Override
-        public void run() {
-            String dir = dirPath.toString();
-            String date = dir.substring(dir.length() - 7);
-            date = date.replace("\\", "/");
-            File[] items = dirPath.listFiles();
-            List<File> itemsArrayList = new ArrayList<>();
-            for (File f : items) {
-                if (f.isFile())
-                    itemsArrayList.add(f);
-            }
-            long count = itemsArrayList.stream().mapToLong(f -> {
-                try {
-                    return Files.lines(f.toPath()).map(s -> s.replace("\ufeff", "")).filter(s -> Pattern.matches(pattern, s)).count();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                    return 0;
-                }
-            }).sum();
-            chatCount.put(date, count);
-            countDownLatch.countDown();
-        }
-    }
+		@Override
+		public void run() {
+			String dir = dirPath.toString();
+			String date = dir.substring(dir.length() - 7);
+			date = date.replace("\\", "/");
+			File[] items = dirPath.listFiles();
+			List<File> itemsArrayList = new ArrayList<>();
+			for (File f : items) {
+				if (f.isFile())
+					itemsArrayList.add(f);
+			}
+			long count = itemsArrayList.stream().mapToLong(f -> {
+				try {
+					return Files.lines(f.toPath()).map(s -> s.replace("\ufeff", ""))
+							.filter(s -> Pattern.matches(pattern, s)).count();
+				} catch (IOException e) {
+					logger.error(e.getMessage(), e);
+					return 0;
+				}
+			}).sum();
+			chatCount.put(date, count);
+			countDownLatch.countDown();
+		}
+	}
 }
