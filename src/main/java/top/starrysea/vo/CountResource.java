@@ -7,7 +7,6 @@ import top.starrysea.hateoas.Resource;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 
 public class CountResource extends Resource {
     private String type;
