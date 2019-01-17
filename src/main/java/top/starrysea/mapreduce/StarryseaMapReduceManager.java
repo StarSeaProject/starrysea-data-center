@@ -45,7 +45,7 @@ public class StarryseaMapReduceManager implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.register(new DateMapper(), new DateReducer().setRepository(countRepository));
+		this.register(new DateMapper(), new DateReducer().setCountRepository(countRepository));
 		this.run();
 	}
 
