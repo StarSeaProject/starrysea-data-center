@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import top.starrysea.mapper.DateMapper;
 import top.starrysea.reducer.DateReducer;
 import top.starrysea.repository.CountRepository;
-import top.starrysea.repository.MostRepository;
 
 @Component
 public class StarryseaMapReduceManager implements InitializingBean {
@@ -26,9 +25,6 @@ public class StarryseaMapReduceManager implements InitializingBean {
 	private String inputPath;
 	@Value("${starrysea.split.output}")
 	private String outputPath;
-
-	@Autowired
-	private MostRepository mostRepository;
 
 	@Autowired
 	private CountRepository countRepository;
