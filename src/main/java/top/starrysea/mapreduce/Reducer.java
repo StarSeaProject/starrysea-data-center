@@ -2,8 +2,6 @@ package top.starrysea.mapreduce;
 
 import java.util.function.Function;
 
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
-
 public abstract class Reducer implements Runnable {
 
 	protected String inputPath;
