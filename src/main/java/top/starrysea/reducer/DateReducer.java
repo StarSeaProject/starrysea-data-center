@@ -2,7 +2,9 @@ package top.starrysea.reducer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import top.starrysea.dto.Count;
 import top.starrysea.mapreduce.Reducer;
 
 import java.io.File;
@@ -17,6 +19,9 @@ public class DateReducer extends Reducer {
 	private ConcurrentHashMap<String, Long> chatCount;
 	private ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	@Autowired
+	private Count count;
 
 	@Override
 	protected void reduce() {
@@ -51,6 +56,10 @@ public class DateReducer extends Reducer {
 			for (Map.Entry<String, Long> entry : chatCount.entrySet()) {
 				logger.info(entry.getKey() + " " + entry.getValue());
 			}
+			count.setType("month");
+			Map<String, Long> chatCountMap = new HashMap<>(chatCount);
+			count.setResult(chatCountMap);
+			//repository.save(count);
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
