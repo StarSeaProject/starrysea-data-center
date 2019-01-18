@@ -18,7 +18,7 @@ public class SearchController {
 
 	@GetMapping("/search/count/{type}")
 	public Mono<CountResource> searchCount(@PathVariable String type){
-		Mono<Count> serviceResult = searchService.SearchCountService(type);
+		Mono<Count> serviceResult = searchService.searchCountService(type);
 		return serviceResult.map(CountResource::of);
 	}
 }

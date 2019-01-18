@@ -28,7 +28,7 @@ public class DateMapper extends Mapper {
 	}
 
 	private void split(String fileName) {
-		this.fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf("."));
+		this.fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
 		item = new StringBuilder();
 		File file = new File(inputPath, fileName);
 		try (Stream<String> stream = Files.lines(file.toPath())) {

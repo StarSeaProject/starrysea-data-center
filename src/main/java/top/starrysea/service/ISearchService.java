@@ -5,5 +5,5 @@ import top.starrysea.dto.Count;
 
 public interface ISearchService {
 
-	Mono<Count> SearchCountService(String type);
+	Mono<Count> searchCountService(String type);
 }

@@ -28,7 +28,7 @@ public class DateReducer extends Reducer {
 		threadPool.setQueueCapacity(25);
 		threadPool.initialize();
 		chatCount = new ConcurrentHashMap<>();
-		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf("."));
+		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf('.'));
 		analyze(inputPath + "/" + fileNameWithoutExtension);
 	}
 
@@ -52,7 +52,7 @@ public class DateReducer extends Reducer {
 			countDownLatch.await();
 			logger.info("对每月发言数的分析结束.");
 			for (Map.Entry<String, Long> entry : chatCount.entrySet()) {
-				logger.info(entry.getKey() + " " + entry.getValue());
+				logger.info("{} {}",entry.getKey(),entry.getValue());
 			}
 			Count count = new Count();
 			count.setType("month");
@@ -61,6 +61,7 @@ public class DateReducer extends Reducer {
 			countRepository.save(count).subscribe();
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
+			Thread.currentThread().interrupt();
 		}
 	}
 

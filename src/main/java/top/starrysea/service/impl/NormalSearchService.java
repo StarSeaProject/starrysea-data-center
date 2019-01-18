@@ -15,7 +15,7 @@ public class NormalSearchService implements ISearchService {
 	private CountRepository countRepository;
 
 	@Override
-	public Mono<Count> SearchCountService(String type) {
+	public Mono<Count> searchCountService(String type) {
 		return countRepository.findById(type);
 	}
 
