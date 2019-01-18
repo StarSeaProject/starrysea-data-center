@@ -3,7 +3,7 @@ logging:
 spring:
   data:
     mongodb:
-      uri: mongodb://root:root1@120.79.145.235:27017/starrysea
+      uri: mongodb://root:root1@120.79.145.235:27017/ss_test
 starrysea:
   split:
     input: D:/chatHistory/raw
