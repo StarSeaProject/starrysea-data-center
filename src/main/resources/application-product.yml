@@ -3,4 +3,8 @@ logging:
 spring:
   data:
     mongodb:
-      uri: mongodb://root:root1@127.0.0.1:27017/starrysea
+      username: root
+      password: root1
+      host: 127.0.0.1
+      port: 27017
+      database: starrysea
