@@ -3,7 +3,6 @@ package top.starrysea.reducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import top.starrysea.dto.Count;
 import top.starrysea.mapreduce.Reducer;
 import top.starrysea.repository.CountRepository;
 
@@ -16,7 +15,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
 public class DateReducer extends Reducer {
-	private ConcurrentHashMap<String, Long> chatCount;
+	private Map<String, Long> chatCount;
 	private ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private CountRepository countRepository;
@@ -52,13 +51,12 @@ public class DateReducer extends Reducer {
 			countDownLatch.await();
 			logger.info("对每月发言数的分析结束.");
 			for (Map.Entry<String, Long> entry : chatCount.entrySet()) {
-				logger.info("{} {}",entry.getKey(),entry.getValue());
+				logger.info("{} {}", entry.getKey(), entry.getValue());
 			}
-			Count count = new Count();
-			count.setType("month");
-			Map<String, Long> chatCountMap = new HashMap<>(chatCount);
-			count.setResult(chatCountMap);
-			countRepository.save(count).subscribe();
+			countRepository.findById("month").subscribe(chatCountTemp -> {
+				chatCountTemp.getResult().putAll(chatCount);
+				countRepository.save(chatCountTemp).subscribe();
+			});
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
