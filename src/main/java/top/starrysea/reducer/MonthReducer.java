@@ -2,7 +2,6 @@ package top.starrysea.reducer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import top.starrysea.mapreduce.Reducer;
 import top.starrysea.repository.CountRepository;
 
@@ -14,25 +13,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
-public class DateReducer extends Reducer {
+public class MonthReducer extends Reducer {
 	private Map<String, Long> chatCount;
-	private ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private CountRepository countRepository;
 
 	@Override
 	protected void reduce() {
-		threadPool.setCorePoolSize(Runtime.getRuntime().availableProcessors());
-		threadPool.setMaxPoolSize(10);
-		threadPool.setQueueCapacity(25);
-		threadPool.initialize();
 		chatCount = new ConcurrentHashMap<>();
 		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf('.'));
 		analyze(inputPath + "/" + fileNameWithoutExtension);
 	}
 
 	private void analyze(String fileDirectory) {
-		ArrayList<File> files = new ArrayList<>();
+		List<File> files = new ArrayList<>();
 		File rootDir = new File(fileDirectory);
 		File[] years = rootDir.listFiles();
 		for (File i : years) {
@@ -50,12 +44,12 @@ public class DateReducer extends Reducer {
 		try {
 			countDownLatch.await();
 			logger.info("对每月发言数的分析结束.");
-			for (Map.Entry<String, Long> entry : chatCount.entrySet()) {
-				logger.info("{} {}", entry.getKey(), entry.getValue());
-			}
+			logger.info("共有{}个月.", chatCount.size());
 			countRepository.findById("month").subscribe(chatCountTemp -> {
 				chatCountTemp.getResult().putAll(chatCount);
+				chatCountTemp.setResult(chatCount);
 				countRepository.save(chatCountTemp).subscribe();
+				logger.info("每月分析已存入数据库.");
 			});
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
