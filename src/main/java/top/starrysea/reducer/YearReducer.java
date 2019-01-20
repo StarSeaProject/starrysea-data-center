@@ -3,6 +3,7 @@ package top.starrysea.reducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import top.starrysea.dto.Count;
 import top.starrysea.mapreduce.Reducer;
 import top.starrysea.repository.CountRepository;
 
@@ -44,7 +45,10 @@ public class YearReducer extends Reducer {
             countDownLatch.await();
             logger.info("对每年发言数的分析结束.");
             logger.info("共有{}年.", chatCount.size());
-            countRepository.findById("year").subscribe(chatCountTemp -> {
+            Count count = new Count();
+            count.setType("year");
+            count.setResult(chatCount);
+            countRepository.findById("year").defaultIfEmpty(count).subscribe(chatCountTemp -> {
                 chatCountTemp.getResult().putAll(chatCount);
                 chatCountTemp.setResult(chatCount);
                 countRepository.save(chatCountTemp).subscribe();

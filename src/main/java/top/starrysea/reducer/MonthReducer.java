@@ -2,6 +2,7 @@ package top.starrysea.reducer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.starrysea.dto.Count;
 import top.starrysea.mapreduce.Reducer;
 import top.starrysea.repository.CountRepository;
 
@@ -45,7 +46,10 @@ public class MonthReducer extends Reducer {
 			countDownLatch.await();
 			logger.info("对每月发言数的分析结束.");
 			logger.info("共有{}个月.", chatCount.size());
-			countRepository.findById("month").subscribe(chatCountTemp -> {
+			Count count = new Count();
+			count.setType("month");
+			count.setResult(chatCount);
+			countRepository.findById("month").defaultIfEmpty(count).subscribe(chatCountTemp -> {
 				chatCountTemp.getResult().putAll(chatCount);
 				chatCountTemp.setResult(chatCount);
 				countRepository.save(chatCountTemp).subscribe();
