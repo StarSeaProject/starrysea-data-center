@@ -22,36 +22,42 @@ public class MapReduceContext {
 	private Map<String, List<SingleMessage>> mappedFile = new ConcurrentHashMap<>();
 	private static final int WRITE_THRESHOLD = 1000;
 
+	private static final String INPUT_PATH = "inputPath";
+	private static final String OUTPUT_PATH = "outputPath";
+	private static final String OUTPUT_FILENAME = "outputFileName";
+	private static final String FILE_EXTENDSION = "fileExtendsion";
+	private static final String OUTPUT_FILE_SUBTYPE = "outputFileSubType";
+
 	public MapReduceContext(String outputFileName, String outputFileSubType, String inputPath, String outputPath) {
-		if (contextData.containsKey("inputPath") || contextData.containsKey("outputPath")) {
+		if (contextData.containsKey(INPUT_PATH) || contextData.containsKey(OUTPUT_PATH)) {
 			throw new UnsupportedOperationException("不可以再初始化该类");
 		}
-		contextData.put("inputPath", inputPath);
-		contextData.put("outputPath", outputPath);
-		contextData.put("outputFileName", outputFileName.substring(0, outputFileName.lastIndexOf('.')));
-		contextData.put("fileExtendsion",
+		contextData.put(INPUT_PATH, inputPath);
+		contextData.put(OUTPUT_PATH, outputPath);
+		contextData.put(OUTPUT_FILENAME, outputFileName.substring(0, outputFileName.lastIndexOf('.')));
+		contextData.put(FILE_EXTENDSION,
 				outputFileName.substring(outputFileName.lastIndexOf('.') + 1, outputFileName.length()));
-		contextData.put("outputFileSubType", outputFileSubType);
+		contextData.put(OUTPUT_FILE_SUBTYPE, outputFileSubType);
 	}
 
 	public String getInputPath() {
-		return (String) contextData.get("inputPath");
+		return (String) contextData.get(INPUT_PATH);
 	}
 
 	public String getOutputPath() {
-		return (String) contextData.get("outputPath");
+		return (String) contextData.get(OUTPUT_PATH);
 	}
 
 	public String getOutputFileName() {
-		return (String) contextData.get("outputFileName");
+		return (String) contextData.get(OUTPUT_FILENAME);
 	}
 
 	public String getOutputFileSubType() {
-		return (String) contextData.get("outputFileSubType");
+		return (String) contextData.get(OUTPUT_FILE_SUBTYPE);
 	}
 
 	public String getFileExtendsion() {
-		return (String) contextData.get("fileExtendsion");
+		return (String) contextData.get(FILE_EXTENDSION);
 	}
 
 	public void setAttribute(String key, Object value) {
