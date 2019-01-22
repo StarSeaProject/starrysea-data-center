@@ -1,4 +1,4 @@
-package top.starrysea.dto;
+package top.starrysea.bo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

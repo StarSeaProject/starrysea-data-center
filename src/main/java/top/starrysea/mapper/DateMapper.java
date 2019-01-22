@@ -1,6 +1,6 @@
 package top.starrysea.mapper;
 
-import top.starrysea.dto.SingleMessage;
+import top.starrysea.bo.SingleMessage;
 import top.starrysea.mapreduce.MapReduceContext;
 import top.starrysea.mapreduce.Mapper;
 

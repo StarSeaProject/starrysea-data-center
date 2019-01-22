@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.starrysea.dto.SingleMessage;
+import top.starrysea.bo.SingleMessage;
 
 public abstract class Mapper implements Runnable {
 

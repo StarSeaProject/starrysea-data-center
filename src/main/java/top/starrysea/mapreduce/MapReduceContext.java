@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.starrysea.dto.SingleMessage;
+import top.starrysea.bo.SingleMessage;
 
 public class MapReduceContext {
 
