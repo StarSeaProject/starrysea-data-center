@@ -36,15 +36,17 @@ public class StarryseaMapReduceManager implements InitializingBean {
 		mapperAndReduces = new ArrayList<>();
 		threadPool = new ThreadPoolTaskExecutor();
 		threadPool.setCorePoolSize(Runtime.getRuntime().availableProcessors());
-		//threadPool.setMaxPoolSize(10);
-		//threadPool.setQueueCapacity(25);
-        //可能是这里的限制太低了,导致按天分析的任务无法进行,也许需要一个大一点的值
+		// threadPool.setMaxPoolSize(10);
+		// threadPool.setQueueCapacity(25);
+		// 可能是这里的限制太低了,导致按天分析的任务无法进行,也许需要一个大一点的值
 		threadPool.initialize();
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-        this.register(new DateMapper(), new MonthReducer().setCountRepository(countRepository), new DayReducer().setCountRepository(countRepository), new YearReducer().setCountRepository(countRepository));
+		this.register(new DateMapper(), new MonthReducer().setCountRepository(countRepository),
+				new DayReducer().setCountRepository(countRepository),
+				new YearReducer().setCountRepository(countRepository));
 		this.run();
 	}
 

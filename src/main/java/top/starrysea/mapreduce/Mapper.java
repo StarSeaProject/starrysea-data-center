@@ -3,18 +3,21 @@ package top.starrysea.mapreduce;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+
+import top.starrysea.dto.SingleMessage;
 
 public abstract class Mapper implements Runnable {
 
@@ -22,8 +25,8 @@ public abstract class Mapper implements Runnable {
 	protected String inputPath;
 	protected String outputPath;
 	private List<Reducer> reducers;
-	protected ReactiveMongoRepository<?, ?> repository;
 	private Function<Runnable, Void> managerThreadPool;
+	private SingleMessage singleMessage;
 
 	public void setInputPath(String inputPath) {
 		this.inputPath = inputPath;
@@ -39,11 +42,6 @@ public abstract class Mapper implements Runnable {
 
 	public List<Reducer> getReducers() {
 		return reducers;
-	}
-
-	public Mapper setRepository(ReactiveMongoRepository<?, ?> repository) {
-		this.repository = repository;
-		return this;
 	}
 
 	public void setManagerThreadPool(Function<Runnable, Void> runReducerTask) {
@@ -80,11 +78,12 @@ public abstract class Mapper implements Runnable {
 					}
 					logger.info("检测到文件变化: {} {}", event.context().toString(), event.kind().toString());
 					updated = false;
-					map(event);
+					MapReduceContext context = new MapReduceContext(event.context().toString(), outputFileSubType(),
+							inputPath, outputPath);
+					split(context);
 					reducers.stream().forEach(reducer -> {
-						reducer.setInputPath(outputPath);
-						reducer.setFileName(event.context().toString());
-						reducer.setManagerThreadPool(managerThreadPool);
+						context.setAttribute("managerThreadPool", managerThreadPool);
+						reducer.setContext(context);
 						managerThreadPool.apply(reducer);
 					});
 				}
@@ -97,7 +96,48 @@ public abstract class Mapper implements Runnable {
 		}
 	}
 
-	protected abstract void map(WatchEvent<?> event);
+	private void split(MapReduceContext context) {
+		String fileName = context.getOutputFileName() + "." + context.getFileExtendsion();
+		File file = new File(inputPath, fileName);
+		try (Stream<String> stream = Files.lines(file.toPath())) {
+			stream.forEach(s -> execStr(s.replace("\ufeff", ""), context));
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+		execStr(context);
+		context.writeFlush();
+		// 将最后的聊天记录送出
+		logger.info("分割好的文件已写入至{}/{}/", outputPath, fileName);
+	}
 
-	protected abstract void mapReduceFinish(List<Future<?>> futures);
+	private void execStr(String str, MapReduceContext context) {
+		String pattern = "\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}:\\d{2} .+([<(]).+([>)])";
+		// 用于判断单个群聊聊天记录开头(日期,昵称,QQ号或邮箱)的正则表达式
+		if (str == null)
+			return;
+		if (Pattern.matches(pattern, str)) {
+			if (singleMessage != null) {
+				map(singleMessage, context);
+			}
+			singleMessage = new SingleMessage();
+			singleMessage.setHead(str + "\n");
+		} else {
+			if (singleMessage.getBody() == null) {
+				singleMessage.setBody(str + "\n");
+			} else {
+				singleMessage.setBody(singleMessage.getBody() + str + "\n");
+			}
+		}
+	}
+
+	private void execStr(MapReduceContext context) {
+		if (singleMessage == null)
+			return;
+		map(singleMessage, context);
+	}
+
+	protected abstract MapReduceContext map(SingleMessage singleMessage, MapReduceContext context);
+
+	protected abstract String outputFileSubType();
+
 }

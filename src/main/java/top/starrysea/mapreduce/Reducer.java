@@ -4,34 +4,27 @@ import java.util.function.Function;
 
 public abstract class Reducer implements Runnable {
 
-	protected String inputPath;
-	private String fileName;
+	private MapReduceContext context;
 	protected Function<Runnable, Void> managerThreadPool;
 
 	@Override
 	public final void run() {
-		reduce();
+		reduce(context);
 	}
 
 	public String getInputPath() {
-		return inputPath;
-	}
-
-	public void setInputPath(String inputPath) {
-		this.inputPath = inputPath;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+		return context.getOutputPath();
 	}
 
 	public String getFileName() {
-		return fileName;
+		return context.getOutputFileName() + "." + context.getOutputFileSubType();
 	}
 
-	public void setManagerThreadPool(Function<Runnable, Void> managerThreadPool) {
-		this.managerThreadPool = managerThreadPool;
+	@SuppressWarnings("unchecked")
+	public void setContext(MapReduceContext context) {
+		this.context = context;
+		this.managerThreadPool = (Function<Runnable, Void>) context.getAttribute("managerThreadPool");
 	}
 
-	protected abstract void reduce();
+	protected abstract void reduce(MapReduceContext context);
 }

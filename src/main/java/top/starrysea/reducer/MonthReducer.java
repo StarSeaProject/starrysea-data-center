@@ -3,6 +3,7 @@ package top.starrysea.reducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.starrysea.dto.Count;
+import top.starrysea.mapreduce.MapReduceContext;
 import top.starrysea.mapreduce.Reducer;
 import top.starrysea.repository.CountRepository;
 
@@ -20,10 +21,10 @@ public class MonthReducer extends Reducer {
 	private CountRepository countRepository;
 
 	@Override
-	protected void reduce() {
+	protected void reduce(MapReduceContext context) {
 		chatCount = new ConcurrentHashMap<>();
 		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf('.'));
-		analyze(inputPath + "/" + fileNameWithoutExtension);
+		analyze(getInputPath() + "/" + fileNameWithoutExtension);
 	}
 
 	private void analyze(String fileDirectory) {
