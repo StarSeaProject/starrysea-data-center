@@ -12,7 +12,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import top.starrysea.mapper.DateMapper;
+import top.starrysea.mapper.IdMapper;
 import top.starrysea.reducer.DayReducer;
+import top.starrysea.reducer.IdReducer;
 import top.starrysea.reducer.MonthReducer;
 import top.starrysea.reducer.YearReducer;
 import top.starrysea.repository.CountRepository;
@@ -47,6 +49,7 @@ public class StarryseaMapReduceManager implements InitializingBean {
 		this.register(new DateMapper(), new MonthReducer().setCountRepository(countRepository),
 				new DayReducer().setCountRepository(countRepository),
 				new YearReducer().setCountRepository(countRepository));
+		this.register(new IdMapper(),new IdReducer().setCountRepository(countRepository));
 		this.run();
 	}
 
