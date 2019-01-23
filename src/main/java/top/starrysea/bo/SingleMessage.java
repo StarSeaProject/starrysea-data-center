@@ -77,8 +77,8 @@ public class SingleMessage {
     }
 
     private void analyze() {
-        String patternQQ = "\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}:\\d{2} .+([(]).+([)])\\n";
-        String patternMail = "\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}:\\d{2} .+([<]).+([>])\\n";
+        String patternQQ = "\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}:\\d{2} .+([(]).+([)])";
+        String patternMail = "\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}:\\d{2} .+([<]).+([>])";
         //区分不同的账号类型，有QQ号还有邮箱
         String time = head.substring(0, 19).trim();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd H:mm:ss");

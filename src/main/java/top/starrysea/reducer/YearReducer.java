@@ -55,7 +55,6 @@ public class YearReducer extends Reducer {
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
-
 		}
 	}
 
