@@ -26,30 +26,19 @@ public class DayReducer extends Reducer {
 	protected void reduce(MapReduceContext context) {
 		chatCount = new ConcurrentHashMap<>();
 		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf('.'));
-		analyze(getInputPath() + "/" + fileNameWithoutExtension);
+		analyze(getInputPath() + "/" + fileNameWithoutExtension + "/byDate");
 	}
 
 	private void analyze(String fileDirectory) {
-		List<File> files = new ArrayList<>();
+		List<File> fileList = new ArrayList<>();
 		File rootDir = new File(fileDirectory);
-		File[] years = rootDir.listFiles();
-		for (File i : years) {
-			if (i.isDirectory()) {
-				File[] months = i.listFiles();
-				for (File j : months) {// 获取所有月份的目录
-					if (j.isDirectory()) {
-						File[] days = j.listFiles();
-						for (File k : days) {
-							if (k.isFile()) {
-								files.add(k);
-							}
-						}
-					}
-				}
-			}
+		File[] files = rootDir.listFiles();
+		for(File i :files){
+			if(i.isFile())
+				fileList.add(i);
 		}
-		CountDownLatch countDownLatch = new CountDownLatch(files.size());
-		files.forEach(f -> managerThreadPool.apply(new ChatCount(f, countDownLatch)));
+		CountDownLatch countDownLatch = new CountDownLatch(fileList.size());
+		fileList.forEach(f -> managerThreadPool.apply(new ChatCount(f, countDownLatch)));
 		try {
 			countDownLatch.await();
 			logger.info("对每日发言数的分析结束.");
@@ -71,7 +60,7 @@ public class DayReducer extends Reducer {
 
 	private class ChatCount implements Runnable {
 		private File path;
-		private String pattern = "\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}:\\d{2} .+([<(]).+([>)])";
+		private String date;
 		private CountDownLatch countDownLatch;
 
 		ChatCount(File path, CountDownLatch countDownLatch) {
@@ -81,16 +70,20 @@ public class DayReducer extends Reducer {
 
 		@Override
 		public void run() {
-			String filePath = path.toString();
-			String date = filePath.substring(filePath.length() - 14, filePath.length() - 4);
+            date = path.getName();
+            date = date.substring(0, date.lastIndexOf('.'));
 			long count = 0;
 			try {
 				count = Files.lines(path.toPath()).map(s -> s.replace("\ufeff", ""))
-						.filter(s -> Pattern.matches(pattern, s)).count();
+				.count();
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}
-			chatCount.put(date, count);
+			if (chatCount.containsKey(date)) {
+                chatCount.put(date, chatCount.get(date) + count);
+			} else {
+				chatCount.put(date, count);
+			}
 			countDownLatch.countDown();
 		}
 	}

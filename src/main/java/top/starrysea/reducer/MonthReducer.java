@@ -24,25 +24,19 @@ public class MonthReducer extends Reducer {
 	protected void reduce(MapReduceContext context) {
 		chatCount = new ConcurrentHashMap<>();
 		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf('.'));
-		analyze(getInputPath() + "/" + fileNameWithoutExtension);
+		analyze(getInputPath() + "/" + fileNameWithoutExtension + "/byDate");
 	}
 
 	private void analyze(String fileDirectory) {
-		List<File> files = new ArrayList<>();
+		List<File> fileList = new ArrayList<>();
 		File rootDir = new File(fileDirectory);
-		File[] years = rootDir.listFiles();
-		for (File i : years) {
-			if (i.isDirectory()) {
-				File[] months = i.listFiles();
-				for (File j : months) {// 获取所有月份的目录
-					if (j.isDirectory()) {
-						files.add(j);
-					}
-				}
-			}
+		File[] files = rootDir.listFiles();
+		for(File i :files){
+			if(i.isFile())
+				fileList.add(i);
 		}
-		CountDownLatch countDownLatch = new CountDownLatch(files.size());
-		files.forEach(f -> managerThreadPool.apply(new ChatCount(f, countDownLatch)));
+		CountDownLatch countDownLatch = new CountDownLatch(fileList.size());
+		fileList.forEach(f -> managerThreadPool.apply(new ChatCount(f, countDownLatch)));
 		try {
 			countDownLatch.await();
 			logger.info("对每月发言数的分析结束.");
@@ -63,37 +57,31 @@ public class MonthReducer extends Reducer {
 	}
 
 	private class ChatCount implements Runnable {
-		private File dirPath;
-		private String pattern = "\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}:\\d{2} .+([<(]).+([>)])";
-		// 用于判断单个群聊聊天记录开头(日期,昵称,QQ号或邮箱)的正则表达式
+		private File path;
+		private String date;
 		private CountDownLatch countDownLatch;
 
-		ChatCount(File dirPath, CountDownLatch countDownLatch) {
-			this.dirPath = dirPath;
+		ChatCount(File path, CountDownLatch countDownLatch) {
+			this.path = path;
 			this.countDownLatch = countDownLatch;
 		}
 
 		@Override
 		public void run() {
-			String dir = dirPath.toString();
-			String date = dir.substring(dir.length() - 7);
-			date = date.replace("\\", "/");
-			File[] items = dirPath.listFiles();
-			List<File> itemsArrayList = new ArrayList<>();
-			for (File f : items) {
-				if (f.isFile())
-					itemsArrayList.add(f);
+			date = path.getName();
+			date = date.substring(0,date.lastIndexOf('-'));
+			long count = 0;
+			try {
+				count = Files.lines(path.toPath()).map(s -> s.replace("\ufeff", ""))
+						.count();
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
 			}
-			long count = itemsArrayList.stream().mapToLong(f -> {
-				try {
-					return Files.lines(f.toPath()).map(s -> s.replace("\ufeff", ""))
-							.filter(s -> Pattern.matches(pattern, s)).count();
-				} catch (IOException e) {
-					logger.error(e.getMessage(), e);
-					return 0;
-				}
-			}).sum();
-			chatCount.put(date, count);
+			if (chatCount.containsKey(date)) {
+				chatCount.put(date, chatCount.get(date) + count);
+			} else {
+				chatCount.put(date, count);
+			}
 			countDownLatch.countDown();
 		}
 	}
