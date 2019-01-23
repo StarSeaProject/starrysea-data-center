@@ -107,7 +107,7 @@ public abstract class Mapper implements Runnable {
 		execStr(context);
 		context.writeFlush();
 		// 将最后的聊天记录送出
-		logger.info("分割好的文件已写入至{}/{}/", outputPath, fileName);
+		logger.info("按日期Map结果存储于{}/{}/byDate/", outputPath, fileName.substring(0, fileName.lastIndexOf('.')));
 	}
 
 	private void execStr(String str, MapReduceContext context) {
@@ -120,12 +120,12 @@ public abstract class Mapper implements Runnable {
 				map(singleMessage, context);
 			}
 			singleMessage = new SingleMessage();
-			singleMessage.setHead(str + "\n");
+			singleMessage.setHead(str);
 		} else {
 			if (singleMessage.getBody() == null) {
-				singleMessage.setBody(str + "\n");
+				singleMessage.setBody(str + "\\n");
 			} else {
-				singleMessage.setBody(singleMessage.getBody() + str + "\n");
+				singleMessage.setBody(singleMessage.getBody() + str + "\\n");
 			}
 		}
 	}
