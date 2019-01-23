@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -106,15 +107,15 @@ public class MapReduceContext {
 		}
 		StringBuilder text = new StringBuilder();
 		messages.forEach(m -> {
-			text.append(m.getHead());
-			text.append(m.getBody());
+			text.append(m.getHead()).append("\\n");
+			text.append(m.getBody()).append("\n");
 		});
 		saveText(text.toString(), strFile);
 	}
 
 	private void saveText(String text, String path) {
 		try {
-			Files.write(Paths.get(path), text.getBytes());
+			Files.write(Paths.get(path), text.getBytes(), StandardOpenOption.APPEND);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}

@@ -26,20 +26,19 @@ public class YearReducer extends Reducer {
 	protected void reduce(MapReduceContext context) {
 		chatCount = new ConcurrentHashMap<>();
 		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf('.'));
-		analyze(getInputPath() + "/" + fileNameWithoutExtension);
+        analyze(getInputPath() + "/" + fileNameWithoutExtension + "/" + context.getOutputFileSubType());
 	}
 
 	private void analyze(String fileDirectory) {
-		List<File> files = new ArrayList<>();
+		List<File> fileList = new ArrayList<>();
 		File rootDir = new File(fileDirectory);
-		File[] years = rootDir.listFiles();
-		for (File i : years) {
-			if (i.isDirectory()) {
-				files.add(i);
-			}
+		File[] files = rootDir.listFiles();
+		for(File i :files){
+			if(i.isFile())
+				fileList.add(i);
 		}
-		CountDownLatch countDownLatch = new CountDownLatch(files.size());
-		files.forEach(f -> managerThreadPool.apply(new ChatCount(f, countDownLatch)));
+		CountDownLatch countDownLatch = new CountDownLatch(fileList.size());
+		fileList.forEach(f -> managerThreadPool.apply(new ChatCount(f, countDownLatch)));
 		try {
 			countDownLatch.await();
 			logger.info("对每年发言数的分析结束.");
@@ -61,41 +60,31 @@ public class YearReducer extends Reducer {
 	}
 
 	private class ChatCount implements Runnable {
-		private File dirPath;
-		private String pattern = "\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}:\\d{2} .+([<(]).+([>)])";
+		private File path;
+		private String date;
 		private CountDownLatch countDownLatch;
 
-		ChatCount(File dirPath, CountDownLatch countDownLatch) {
-			this.dirPath = dirPath;
+		ChatCount(File path, CountDownLatch countDownLatch) {
+			this.path = path;
 			this.countDownLatch = countDownLatch;
 		}
 
 		@Override
 		public void run() {
-			String dir = dirPath.toString();
-			String date = dir.substring(dir.length() - 4);
-			File[] months = dirPath.listFiles();
-			List<File> itemsArrayList = new ArrayList<>();
-			for (File i : months) {
-				if (i.isDirectory()) {
-					File[] days = i.listFiles();
-					for (File j : days) {
-						if (j.isFile()) {
-							itemsArrayList.add(j);
-						}
-					}
-				}
+			date = path.getName();
+			date = date.substring(0, date.indexOf('-'));
+			long count = 0;
+			try {
+				count = Files.lines(path.toPath()).map(s -> s.replace("\ufeff", ""))
+						.count();
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
 			}
-			long count = itemsArrayList.stream().mapToLong(f -> {
-				try {
-					return Files.lines(f.toPath()).map(s -> s.replace("\ufeff", ""))
-							.filter(s -> Pattern.matches(pattern, s)).count();
-				} catch (IOException e) {
-					logger.error(e.getMessage(), e);
-					return 0;
-				}
-			}).sum();
-			chatCount.put(date, count);
+			if (chatCount.containsKey(date)) {
+				chatCount.put(date, chatCount.get(date) + count);
+			} else {
+				chatCount.put(date, count);
+			}
 			countDownLatch.countDown();
 		}
 	}
