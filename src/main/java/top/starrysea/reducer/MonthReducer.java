@@ -24,7 +24,7 @@ public class MonthReducer extends Reducer {
 	protected void reduce(MapReduceContext context) {
 		chatCount = new ConcurrentHashMap<>();
 		String fileNameWithoutExtension = getFileName().substring(0, getFileName().lastIndexOf('.'));
-		analyze(getInputPath() + "/" + fileNameWithoutExtension + "/byDate");
+        analyze(getInputPath() + "/" + fileNameWithoutExtension + "/" + context.getOutputFileSubType());
 	}
 
 	private void analyze(String fileDirectory) {
