@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.regex.Pattern;
 
 public class MonthReducer extends Reducer {
 	private Map<String, Long> chatCount;

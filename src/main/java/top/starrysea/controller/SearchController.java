@@ -16,9 +16,21 @@ public class SearchController {
 	@Autowired
 	private ISearchService searchService;
 
-	@GetMapping("/search/count/{type}")
-	public Mono<CountResource> searchCount(@PathVariable String type){
-		Mono<Count> serviceResult = searchService.searchCountService(type);
+	@GetMapping("/date/{year}/{month}")
+	public Mono<CountResource> searchCountByMonth(@PathVariable("year") String year, @PathVariable("month") String month) {
+		Mono<Count> serviceResult = searchService.searchCountServiceByMonth(year, month);
+		return serviceResult.map((Count search) -> CountResource.of(search, year, month));
+	}
+
+	@GetMapping("/date/{year}")
+	public Mono<CountResource> searchCountByYear(@PathVariable String year) {
+		Mono<Count> serviceResult = searchService.searchCountServiceByYear(year);
+		return serviceResult.map((Count search) -> CountResource.of(search, year));
+	}
+
+	@GetMapping("/date")
+	public Mono<CountResource> searchCount() {
+		Mono<Count> serviceResult = searchService.searchCountService();
 		return serviceResult.map(CountResource::of);
 	}
 }
