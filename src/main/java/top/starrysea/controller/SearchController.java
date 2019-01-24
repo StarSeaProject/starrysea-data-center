@@ -18,13 +18,13 @@ public class SearchController {
 
 	@GetMapping("/date/{year}/{month}")
 	public Mono<CountResource> searchCountByMonth(@PathVariable("year") String year, @PathVariable("month") String month) {
-		Mono<Count> serviceResult = searchService.searchCountService(year, month);
+		Mono<Count> serviceResult = searchService.searchCountServiceByMonth(year, month);
 		return serviceResult.map((Count search) -> CountResource.of(search, year, month));
 	}
 
 	@GetMapping("/date/{year}")
 	public Mono<CountResource> searchCountByYear(@PathVariable String year) {
-		Mono<Count> serviceResult = searchService.searchCountService(year);
+		Mono<Count> serviceResult = searchService.searchCountServiceByYear(year);
 		return serviceResult.map((Count search) -> CountResource.of(search, year));
 	}
 
