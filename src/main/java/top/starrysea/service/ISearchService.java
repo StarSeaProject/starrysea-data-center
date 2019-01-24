@@ -5,7 +5,7 @@ import top.starrysea.dto.Count;
 
 public interface ISearchService {
 
-	Mono<Count> searchCountService(String year, String month);
-	Mono<Count> searchCountService(String year);
+	Mono<Count> searchCountServiceByMonth(String year, String month);
+	Mono<Count> searchCountServiceByYear(String year);
 	Mono<Count> searchCountService();
 }

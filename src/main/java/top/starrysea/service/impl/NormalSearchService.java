@@ -15,12 +15,12 @@ public class NormalSearchService implements ISearchService {
 	private CountRepository countRepository;
 
 	@Override
-	public Mono<Count> searchCountService(String year,String month) {
+	public Mono<Count> searchCountServiceByMonth(String year,String month) {
 		return countRepository.findById("day");
 	}
 
 	@Override
-	public Mono<Count> searchCountService(String year) {
+	public Mono<Count> searchCountServiceByYear(String year) {
 		return countRepository.findById("month");
 	}
 
