@@ -4,7 +4,9 @@ import top.starrysea.controller.SearchController;
 import top.starrysea.dto.Count;
 import top.starrysea.hateoas.Resource;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CountResource extends Resource {
@@ -14,41 +16,31 @@ public class CountResource extends Resource {
 	private CountResource(Count search, String year, String month) {
 		this.type = search.getType();
 		this.result = search.getResult();
-		Map<String, Object> args = new HashMap<>();
-		String keyword = year + "-" + month + "-";
-		Map<String, Long> newResult = new HashMap<>();
-		this.result.forEach((key, value) -> {
-			if (key.contains(keyword)) {
-				newResult.put(key, value);
-			}
-		});
-		this.result = newResult;
-		args.put("year", year);
-		args.put("month", month);
-		this.addLink(linkTo(SearchController.class, "searchCountByMonth", null, args));
 	}
 
 	private CountResource(Count search, String year) {
 		this.type = search.getType();
 		this.result = search.getResult();
-		Map<String, Object> args = new HashMap<>();
-		String keyword = year + "-";
-		Map<String, Long> newResult = new HashMap<>();
-		this.result.forEach((key, value) -> {
-			if (key.contains(keyword)) {
-				newResult.put(key, value);
-			}
-		});
-		this.result = newResult;
-		args.put("year", year);
-		this.addLink(linkTo(SearchController.class, "searchCountByYear", null, args));
+        List<Map<String, String>> inArgList = new ArrayList<>();
+        this.result.forEach((key, value) -> {
+            Map<String, String> inArgItem = new HashMap<>();
+            inArgItem.put("year", key.substring(0, key.indexOf('-')));
+            inArgItem.put("month", key.substring(key.indexOf('-') + 1));
+            inArgList.add(inArgItem);
+        });
+        inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByMonth", m, null)));
 	}
 
 	private CountResource(Count search) {
 		this.type = search.getType();
 		this.result = search.getResult();
-		Map<String, Object> args = new HashMap<>();
-		this.addLink(linkTo(SearchController.class, "searchCount", null, args));
+        List<Map<String, String>> inArgList = new ArrayList<>();
+        this.result.forEach((key, value) -> {
+            Map<String, String> inArgItem = new HashMap<>();
+            inArgItem.put("year", key);
+            inArgList.add(inArgItem);
+        });
+        inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByYear", m, null)));
 	}
 
 	public static CountResource of(Count search, String year, String month) {
