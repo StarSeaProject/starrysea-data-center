@@ -2,7 +2,6 @@ package top.starrysea.vo;
 
 import top.starrysea.controller.SearchController;
 import top.starrysea.dto.Count;
-import top.starrysea.hateoas.LinkBinding;
 import top.starrysea.hateoas.Resource;
 
 import java.util.HashMap;
@@ -26,7 +25,7 @@ public class CountResource extends Resource {
 		this.result = newResult;
 		args.put("year", year);
 		args.put("month", month);
-		this.addLink(LinkBinding.linkTo(SearchController.class, "searchCountByMonth", null, args));
+		this.addLink(linkTo(SearchController.class, "searchCountByMonth", null, args));
 	}
 
 	private CountResource(Count search, String year) {
@@ -42,14 +41,14 @@ public class CountResource extends Resource {
 		});
 		this.result = newResult;
 		args.put("year", year);
-		this.addLink(LinkBinding.linkTo(SearchController.class, "searchCountByYear", null, args));
+		this.addLink(linkTo(SearchController.class, "searchCountByYear", null, args));
 	}
 
 	private CountResource(Count search) {
 		this.type = search.getType();
 		this.result = search.getResult();
 		Map<String, Object> args = new HashMap<>();
-		this.addLink(LinkBinding.linkTo(SearchController.class, "searchCount", null, args));
+		this.addLink(linkTo(SearchController.class, "searchCount", null, args));
 	}
 
 	public static CountResource of(Count search, String year, String month) {
