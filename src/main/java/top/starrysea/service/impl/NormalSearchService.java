@@ -8,6 +8,9 @@ import top.starrysea.dto.Count;
 import top.starrysea.repository.CountRepository;
 import top.starrysea.service.ISearchService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service("normalSearchService")
 public class NormalSearchService implements ISearchService {
 
@@ -16,12 +19,30 @@ public class NormalSearchService implements ISearchService {
 
 	@Override
 	public Mono<Count> searchCountServiceByMonth(String year,String month) {
-		return countRepository.findById("day");
+		return countRepository.findById("day").doOnNext(c -> {
+			String keyword = year + "-" + month + "-";
+			Map<String, Long> newResult = new HashMap<>();
+			c.getResult().forEach((key, value) -> {
+				if (key.contains(keyword)) {
+					newResult.put(key, value);
+				}
+			});
+			c.setResult(newResult);
+		});
 	}
 
 	@Override
 	public Mono<Count> searchCountServiceByYear(String year) {
-		return countRepository.findById("month");
+		return countRepository.findById("month").doOnNext(c -> {
+			String keyword = year + "-";
+			Map<String, Long> newResult = new HashMap<>();
+			c.getResult().forEach((key, value) -> {
+				if (key.contains(keyword)) {
+					newResult.put(key, value);
+				}
+			});
+			c.setResult(newResult);
+		});
 	}
 
 	@Override
