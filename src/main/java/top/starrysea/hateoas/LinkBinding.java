@@ -19,10 +19,14 @@ public class LinkBinding implements InitializingBean {
 	private static Map<RequestMappingInfo, HandlerMethod> controllerHandlerMapping;
 
 	public static Link linkTo(Class<?> clazz, String method) {
-		return linkTo(clazz, method, null);
+		return linkTo(clazz, method, null, null);
 	}
 
-	public static Link linkTo(Class<?> clazz, String method, Map<String, Object> template) {
+	public static Link linkTo(Class<?> clazz, String method, Map<String, String> inArg) {
+		return linkTo(clazz, method, inArg, null);
+	}
+
+	public static Link linkTo(Class<?> clazz, String method, Map<String, String> inArg, Map<String, Object> template) {
 		for (Map.Entry<RequestMappingInfo, HandlerMethod> m : controllerHandlerMapping.entrySet()) {
 			HandlerMethod handlerMethod = m.getValue();
 			if (handlerMethod.getMethod().getDeclaringClass() == clazz
@@ -34,12 +38,14 @@ public class LinkBinding implements InitializingBean {
 						.toArray(new RequestMethod[0])[0];
 				Link link;
 				String url = pattern.getPatternString();
-				if (template != null) {
-					for (Map.Entry<String, Object> entry : template.entrySet()) {
+				if (inArg != null) {
+					for (Map.Entry<String, String> entry : inArg.entrySet()) {
 						if (url.contains(entry.getKey())) {
-							url = url.replaceAll("\\{" + entry.getKey() + "\\}", (String) entry.getValue());
+							url = url.replaceAll("\\{" + entry.getKey() + "\\}", entry.getValue());
 						}
 					}
+				}
+				if (template != null) {
 					link = new Link(url, requestMethod, template);
 				} else {
 					link = new Link(url, requestMethod);
