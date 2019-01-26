@@ -12,3 +12,4 @@ starrysea:
   split:
     input: D:/chatHistory/raw
     output: D:/chatHistory/result
+  bloomfile: D:/chatHistory/filterlist.txt
