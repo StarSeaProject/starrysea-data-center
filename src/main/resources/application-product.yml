@@ -8,3 +8,12 @@ spring:
       host: 127.0.0.1
       port: 27017
       database: starrysea
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: root1
+starrysea:
+  split:
+    input: chatHistory
+    output: chatHistory/result
+  bloomfile: filter

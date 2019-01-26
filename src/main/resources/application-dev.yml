@@ -8,6 +8,10 @@ spring:
       host: 120.79.145.235
       port: 27017
       database: starrysea-test
+  redis:
+    host: 120.79.145.235
+    port: 6379
+    password: root1
 starrysea:
   split:
     input: D:/chatHistory/raw

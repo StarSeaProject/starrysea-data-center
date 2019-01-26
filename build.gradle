@@ -29,5 +29,6 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
 	implementation('com.google.guava:guava:23.0')
 	implementation('org.springframework.boot:spring-boot-starter-aop')
+	implementation('org.springframework.boot:spring-boot-starter-data-redis-reactive')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
