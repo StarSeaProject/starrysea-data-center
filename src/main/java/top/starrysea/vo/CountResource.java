@@ -28,7 +28,12 @@ public class CountResource extends Resource {
             inArgItem.put("month", key.substring(key.indexOf('-') + 1));
             inArgList.add(inArgItem);
         });
-        inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByMonth", m, null)));
+		inArgList.forEach(m -> {
+			Map<String, Object> templateMap = new HashMap<>();
+			templateMap.put("date", m.get("year") + "-" + m.get("month"));
+            //往links里面的template中加了date属性存储日期信息(其实就是result中的key),防止JS的object中纯数字key自动重新排序造成关联混乱
+			this.addLink(linkTo(SearchController.class, "searchCountByMonth", m, templateMap));
+		});
 	}
 
 	private CountResource(Count search) {
@@ -40,7 +45,12 @@ public class CountResource extends Resource {
             inArgItem.put("year", key);
             inArgList.add(inArgItem);
         });
-        inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByYear", m, null)));
+		inArgList.forEach(m -> {
+			Map<String, Object> templateMap = new HashMap<>();
+			templateMap.put("date", m.get("year"));
+            //往links里面的template中加了date属性存储日期信息(其实就是result中的key),防止JS的object中纯数字key自动重新排序造成关联混乱
+			this.addLink(linkTo(SearchController.class, "searchCountByYear", m, templateMap));
+		});
 	}
 
 	public static CountResource of(Count search, String year, String month) {
