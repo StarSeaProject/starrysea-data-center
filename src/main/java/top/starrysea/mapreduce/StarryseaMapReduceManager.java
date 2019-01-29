@@ -2,6 +2,7 @@ package top.starrysea.mapreduce;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.PostConstruct;
 
@@ -39,13 +40,16 @@ public class StarryseaMapReduceManager implements InitializingBean {
 		mapperAndReduces = new ArrayList<>();
 		mapperThreadPool = new ThreadPoolTaskExecutor();
 		mapperThreadPool.setCorePoolSize(Runtime.getRuntime().availableProcessors());
-		// threadPool.setMaxPoolSize(10);
-		// threadPool.setQueueCapacity(25);
-		// 可能是这里的限制太低了,导致按天分析的任务无法进行,也许需要一个大一点的值
+		mapperThreadPool.setMaxPoolSize(10);
+		mapperThreadPool.setQueueCapacity(25);
+		mapperThreadPool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		mapperThreadPool.initialize();
 
 		reducerThreadPool = new ThreadPoolTaskExecutor();
 		reducerThreadPool.setCorePoolSize(Runtime.getRuntime().availableProcessors());
+		reducerThreadPool.setMaxPoolSize(10);
+		reducerThreadPool.setQueueCapacity(25);
+		reducerThreadPool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		reducerThreadPool.initialize();
 	}
 
