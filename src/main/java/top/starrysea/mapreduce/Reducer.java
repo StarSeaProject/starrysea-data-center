@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -55,7 +54,7 @@ public abstract class Reducer implements Runnable {
 		CountDownLatch countDownLatch = new CountDownLatch(fileList.size());
 		fileList.stream().forEach(f -> managerThreadPool.apply(new ReduceTask(f, countDownLatch)));
 		try {
-			countDownLatch.await(10, TimeUnit.SECONDS);
+			countDownLatch.await();
 			Map<String, Long> finalResult = new HashMap<>();
 			for (Map.Entry<String, AtomicLong> entry : reduceResult.entrySet()) {
 				finalResult.put(entry.getKey(), entry.getValue().get());

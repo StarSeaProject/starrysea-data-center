@@ -107,7 +107,9 @@ public abstract class Mapper implements Runnable {
 		execStr(context);
 		context.writeFlush();
 		// 将最后的聊天记录送出
-		logger.info("Map结果存储于{}/{}/", outputPath, fileName.substring(0, fileName.lastIndexOf('.')));
+		if (logger.isInfoEnabled()) {
+			logger.info("Map结果存储于{}/{}/", outputPath, fileName.substring(0, fileName.lastIndexOf('.')));
+		}
 	}
 
 	private void execStr(String str, MapReduceContext context) {

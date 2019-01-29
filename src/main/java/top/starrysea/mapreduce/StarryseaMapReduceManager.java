@@ -38,8 +38,8 @@ public class StarryseaMapReduceManager implements InitializingBean {
 	@PostConstruct
 	private void init() {
 		mapperAndReduces = new ArrayList<>();
-		
-		//初始化mapper的线程池
+
+		// 初始化mapper的线程池
 		mapperThreadPool = new ThreadPoolTaskExecutor();
 		mapperThreadPool.setCorePoolSize(Runtime.getRuntime().availableProcessors());
 		mapperThreadPool.setMaxPoolSize(10);
@@ -47,7 +47,7 @@ public class StarryseaMapReduceManager implements InitializingBean {
 		mapperThreadPool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		mapperThreadPool.initialize();
 
-		//初始化reducer的线程池
+		// 初始化reducer的线程池
 		reducerThreadPool = new ThreadPoolTaskExecutor();
 		reducerThreadPool.setCorePoolSize(Runtime.getRuntime().availableProcessors());
 		reducerThreadPool.setMaxPoolSize(10);
