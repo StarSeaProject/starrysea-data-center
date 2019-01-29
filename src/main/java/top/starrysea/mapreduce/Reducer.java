@@ -60,7 +60,6 @@ public abstract class Reducer implements Runnable {
 			for (Map.Entry<String, AtomicLong> entry : reduceResult.entrySet()) {
 				finalResult.put(entry.getKey(), entry.getValue().get());
 			}
-			logger.debug(finalResult.toString());
 			reduceFinish(finalResult, context);
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
