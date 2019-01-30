@@ -12,10 +12,12 @@ import java.util.Map;
 public class CountResource extends Resource {
 	private String type;
 	private Map<String, Long> result;
+	private List<Map<String, Object>> resultList;
 
 	private CountResource(Count search, String year, String month) {
 		this.type = search.getType();
 		this.result = search.getResult();
+		this.resultList=Count.mapToList(this.result);
 	}
 
 	private CountResource(Count search, String year) {
@@ -28,12 +30,8 @@ public class CountResource extends Resource {
             inArgItem.put("month", key.substring(key.indexOf('-') + 1));
             inArgList.add(inArgItem);
         });
-		inArgList.forEach(m -> {
-			Map<String, Object> templateMap = new HashMap<>();
-			templateMap.put("date", m.get("year") + "-" + m.get("month"));
-            //往links里面的template中加了date属性存储日期信息(其实就是result中的key),防止JS的object中纯数字key自动重新排序造成关联混乱
-			this.addLink(linkTo(SearchController.class, "searchCountByMonth", m, templateMap));
-		});
+        this.resultList=Count.mapToList(this.result);
+		inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByMonth", m, null)));
 	}
 
 	private CountResource(Count search) {
@@ -45,12 +43,8 @@ public class CountResource extends Resource {
             inArgItem.put("year", key);
             inArgList.add(inArgItem);
         });
-		inArgList.forEach(m -> {
-			Map<String, Object> templateMap = new HashMap<>();
-			templateMap.put("date", m.get("year"));
-            //往links里面的template中加了date属性存储日期信息(其实就是result中的key),防止JS的object中纯数字key自动重新排序造成关联混乱
-			this.addLink(linkTo(SearchController.class, "searchCountByYear", m, templateMap));
-		});
+		this.resultList=Count.mapToList(this.result);
+		inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByYear", m, null)));
 	}
 
 	public static CountResource of(Count search, String year, String month) {
@@ -69,7 +63,7 @@ public class CountResource extends Resource {
 		return type;
 	}
 
-	public Map<String, Long> getResult() {
-		return result;
+	public List<Map<String, Object>> getResultList() {
+		return resultList;
 	}
 }
