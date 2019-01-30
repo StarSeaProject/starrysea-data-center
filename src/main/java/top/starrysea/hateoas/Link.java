@@ -10,17 +10,17 @@ public class Link {
 	private RequestMethod method;
 	private Map<String, Object> template;
 
-	public Link(String href) {
+	Link(String href) {
 		this.href = href;
 		this.method = RequestMethod.GET;
 	}
 
-	public Link(String href, RequestMethod method) {
+	Link(String href, RequestMethod method) {
 		this.href = href;
 		this.method = method;
 	}
 
-	public Link(String href, RequestMethod method, Map<String, Object> template) {
+	Link(String href, RequestMethod method, Map<String, Object> template) {
 		this.href = href;
 		this.method = method;
 		this.template = template;
