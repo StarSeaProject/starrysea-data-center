@@ -36,8 +36,6 @@ public class IdReducer extends Reducer {
 
 	@Override
 	protected void reduceFinish(Map<String, Long> reduceResult, MapReduceContext context) {
-		logger.info("按id分析结束.");
-		logger.info("共有{}位用户发言.", reduceResult.size());
 		Count count = new Count();
 		count.setType("userId");
 		count.setResult(reduceResult);

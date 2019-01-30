@@ -61,7 +61,7 @@ public abstract class Mapper implements Runnable {
 				outputDir.mkdirs();
 				logger.info("{} 目录已创建", outputPath);
 			}
-			logger.info("现可将聊天记录文件放入{}/中,处理完成后将输出至{}/", inputPath, outputPath);
+			logger.info("Mapper输入目录为{}/,输出目录为{}/", inputPath, outputPath);
 			Path path = inputDir.toPath();
 			path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 			WatchKey key;
@@ -99,6 +99,14 @@ public abstract class Mapper implements Runnable {
 	private void split(MapReduceContext context) {
 		String fileName = context.getOutputFileName() + "." + context.getFileExtendsion();
 		File file = new File(inputPath, fileName);
+		String strOutPutDirectory = context.getOutputPath() + "/" + context.getOutputFileName() + "/" + context.getOutputFileSubType();
+		File[] files = new File(strOutPutDirectory).listFiles();
+		if (files != null)
+			for (File f : files) {
+				if (f.isFile())
+					f.delete();
+			}
+		//删除原来存在其中的文件
 		try (Stream<String> stream = Files.lines(file.toPath())) {
 			stream.forEach(s -> execStr(s.replace("\ufeff", ""), context));
 		} catch (IOException e) {
