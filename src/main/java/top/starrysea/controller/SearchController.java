@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import reactor.core.publisher.Mono;
 import top.starrysea.dto.Count;
+import top.starrysea.keyword.KeywordChain;
+import top.starrysea.keyword.KeywordFilter;
 import top.starrysea.service.ISearchService;
 import top.starrysea.vo.CountResource;
 import top.starrysea.vo.SearchResource;
@@ -16,14 +18,12 @@ public class SearchController {
 
 	@Autowired
 	private ISearchService searchService;
+	@Autowired
+	private KeywordFilter keywordFilter;
 
 	@GetMapping("/search/{keyword}")
 	public Mono<SearchResource> search(@PathVariable("keyword") String keyword) {
-		return Mono.just(new SearchResource()).doOnNext(searchResource -> {
-			if (keyword.equals("时间")) {
-				searchResource.addDateSearchLink();
-			}
-		});
+		return KeywordChain.startKeywordChain(keyword, keywordFilter);
 	}
 
 	@GetMapping("/date/{year}/{month}")
