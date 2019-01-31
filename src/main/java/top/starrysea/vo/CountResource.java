@@ -17,33 +17,33 @@ public class CountResource extends Resource {
 	private CountResource(Count search, String year, String month) {
 		this.type = search.getType();
 		this.result = search.getResult();
-		this.resultList=Count.mapToList(this.result);
+		this.resultList = Count.mapToList(this.result);
 	}
 
 	private CountResource(Count search, String year) {
 		this.type = search.getType();
 		this.result = search.getResult();
-        List<Map<String, String>> inArgList = new ArrayList<>();
-        this.result.forEach((key, value) -> {
-            Map<String, String> inArgItem = new HashMap<>();
-            inArgItem.put("year", key.substring(0, key.indexOf('-')));
-            inArgItem.put("month", key.substring(key.indexOf('-') + 1));
-            inArgList.add(inArgItem);
-        });
-        this.resultList=Count.mapToList(this.result);
+		List<Map<String, String>> inArgList = new ArrayList<>();
+		this.result.forEach((key, value) -> {
+			Map<String, String> inArgItem = new HashMap<>();
+			inArgItem.put("year", key.substring(0, key.indexOf('-')));
+			inArgItem.put("month", key.substring(key.indexOf('-') + 1));
+			inArgList.add(inArgItem);
+		});
+		this.resultList = Count.mapToList(this.result);
 		inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByMonth", m, null)));
 	}
 
 	private CountResource(Count search) {
 		this.type = search.getType();
 		this.result = search.getResult();
-        List<Map<String, String>> inArgList = new ArrayList<>();
-        this.result.forEach((key, value) -> {
-            Map<String, String> inArgItem = new HashMap<>();
-            inArgItem.put("year", key);
-            inArgList.add(inArgItem);
-        });
-		this.resultList=Count.mapToList(this.result);
+		List<Map<String, String>> inArgList = new ArrayList<>();
+		this.result.forEach((key, value) -> {
+			Map<String, String> inArgItem = new HashMap<>();
+			inArgItem.put("year", key);
+			inArgList.add(inArgItem);
+		});
+		this.resultList = Count.mapToList(this.result);
 		inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByYear", m, null)));
 	}
 

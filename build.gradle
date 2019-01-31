@@ -31,7 +31,7 @@ dependencies {
 	implementation('com.google.guava:guava:23.0')
 	implementation('org.springframework.boot:spring-boot-starter-aop')
 	implementation('org.springframework.boot:spring-boot-starter-data-redis-reactive')
-	implementation('com.github.StarSeaProject:starrysea-hateoas:1.1.0')
-	implementation('com.github.StarSeaProject:starrysea-mapreduce:446711bb7a'){transitive = false}
+	implementation('com.github.StarSeaProject:starrysea-hateoas:1.2.0')
+	implementation('com.github.StarSeaProject:starrysea-mapreduce:1.1.0'){transitive = false}
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
