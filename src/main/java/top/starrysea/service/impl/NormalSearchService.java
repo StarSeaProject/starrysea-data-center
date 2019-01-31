@@ -8,7 +8,6 @@ import top.starrysea.dto.Count;
 import top.starrysea.repository.CountRepository;
 import top.starrysea.service.ISearchService;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 

@@ -32,5 +32,6 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-aop')
 	implementation('org.springframework.boot:spring-boot-starter-data-redis-reactive')
 	implementation('com.github.StarSeaProject:starrysea-hateoas:1.1.0')
+	implementation('com.github.StarSeaProject:starrysea-mapreduce:446711bb7a'){transitive = false}
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
