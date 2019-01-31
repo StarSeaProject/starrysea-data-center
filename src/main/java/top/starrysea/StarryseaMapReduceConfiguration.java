@@ -17,20 +17,30 @@ import top.starrysea.repository.CountRepository;
 @Configuration
 public class StarryseaMapReduceConfiguration {
 
-	@Autowired
-	private CountRepository countRepository;
 	@Value("${starrysea.split.input}")
 	private String inputPath;
 	@Value("${starrysea.split.output}")
 	private String outputPath;
 
+	@Autowired
+	private DateMapper dateMapper;
+	@Autowired
+	private MonthReducer monthReducer;
+	@Autowired
+	private DayReducer dayReducer;
+	@Autowired
+	private YearReducer yearReducer;
+
+	@Autowired
+	private IdMapper idMapper;
+	@Autowired
+	private IdReducer idReducer;
+
 	@Bean
-	public StarryseaMapReduceManager getStarryseaMapReduceManager() {
+	public StarryseaMapReduceManager getStarryseaMapReduceManager(CountRepository countRepository) {
 		StarryseaMapReduceManager starryseaMapReduceManager = new StarryseaMapReduceManager(inputPath, outputPath);
-		starryseaMapReduceManager.register(new DateMapper(), new MonthReducer().setCountRepository(countRepository),
-				new DayReducer().setCountRepository(countRepository),
-				new YearReducer().setCountRepository(countRepository));
-		starryseaMapReduceManager.register(new IdMapper(), new IdReducer().setCountRepository(countRepository));
+		starryseaMapReduceManager.register(dateMapper, monthReducer, dayReducer, yearReducer);
+		starryseaMapReduceManager.register(idMapper, idReducer);
 		starryseaMapReduceManager.run();
 		return starryseaMapReduceManager;
 	}

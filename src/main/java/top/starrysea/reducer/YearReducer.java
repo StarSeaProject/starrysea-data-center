@@ -12,7 +12,13 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
 public class YearReducer extends Reducer {
+
+	@Autowired
 	private CountRepository countRepository;
 
 	public Reducer setCountRepository(CountRepository countRepository) {
