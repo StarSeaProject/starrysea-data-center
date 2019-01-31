@@ -46,7 +46,6 @@ public class YearReducer extends Reducer {
 		count.setResult(reduceResult);
 		countRepository.findById("year").defaultIfEmpty(count).subscribe(chatCountTemp -> {
 			chatCountTemp.getResult().putAll(reduceResult);
-			chatCountTemp.setResult(reduceResult);
 			countRepository.save(chatCountTemp).subscribe();
 			logger.info("每年分析已存入数据库.");
 		});

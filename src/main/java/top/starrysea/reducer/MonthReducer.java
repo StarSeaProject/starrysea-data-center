@@ -46,7 +46,6 @@ public class MonthReducer extends Reducer {
 		count.setResult(reduceResult);
 		countRepository.findById("month").defaultIfEmpty(count).subscribe(chatCountTemp -> {
 			chatCountTemp.getResult().putAll(reduceResult);
-			chatCountTemp.setResult(reduceResult);
 			countRepository.save(chatCountTemp).subscribe();
 			logger.info("每月分析已存入数据库.");
 		});

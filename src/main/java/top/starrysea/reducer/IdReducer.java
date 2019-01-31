@@ -47,7 +47,6 @@ public class IdReducer extends Reducer {
 		count.setResult(reduceResult);
 		countRepository.findById("userId").defaultIfEmpty(count).subscribe(chatCountTemp -> {
 			chatCountTemp.getResult().putAll(reduceResult);
-			chatCountTemp.setResult(reduceResult);
 			countRepository.save(chatCountTemp).subscribe();
 			logger.info("id分析已存入数据库.");
 		});
