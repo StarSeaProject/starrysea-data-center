@@ -1,7 +1,9 @@
 package top.starrysea.keyword;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,7 +23,10 @@ public class KeywordFilter {
 	}
 
 	public Set<String> hasKeyword(String keyword) {
-		return filters.entrySet().stream().filter(filter -> filter.getValue().mightContain(keyword))
+		List<String> subKeywords = Arrays.asList(keyword.split(" "));
+		return filters.entrySet().stream()
+				.filter(filter -> subKeywords.stream().distinct().filter(subKeyword -> !subKeyword.equals(""))
+						.anyMatch(subKeyword -> filter.getValue().mightContain(subKeyword)))
 				.map(Map.Entry::getKey).collect(Collectors.toSet());
 	}
 }
