@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
 import top.starrysea.dto.Count;
 import top.starrysea.service.ISearchService;
 import top.starrysea.vo.CountResource;
+import top.starrysea.vo.SearchResource;
 
 @RestController
 public class SearchController {
@@ -16,8 +17,18 @@ public class SearchController {
 	@Autowired
 	private ISearchService searchService;
 
+	@GetMapping("/search/{keyword}")
+	public Mono<SearchResource> search(@PathVariable("keyword") String keyword) {
+		return Mono.just(new SearchResource()).doOnNext(searchResource -> {
+			if (keyword.equals("时间")) {
+				searchResource.addDateSearchLink();
+			}
+		});
+	}
+
 	@GetMapping("/date/{year}/{month}")
-	public Mono<CountResource> searchCountByMonth(@PathVariable("year") String year, @PathVariable("month") String month) {
+	public Mono<CountResource> searchCountByMonth(@PathVariable("year") String year,
+			@PathVariable("month") String month) {
 		Mono<Count> serviceResult = searchService.searchCountServiceByMonth(year, month);
 		return serviceResult.map((Count search) -> CountResource.of(search, year, month));
 	}
