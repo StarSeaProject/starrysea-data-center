@@ -33,12 +33,4 @@ public class StarryseaDataCenterApplication {
 		return new ReactiveRedisTemplate<>(reactiveRedisConnectionFactory, serializationContext);
 	}
 
-	@Bean
-	public MappingMongoConverter mongoConverter(MongoDbFactory mongoFactory, MongoMappingContext mongoMappingContext)
-			throws Exception {
-		DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoFactory);
-		MappingMongoConverter mongoConverter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
-		mongoConverter.setMapKeyDotReplacement(".");
-		return mongoConverter;
-	}
 }
