@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import reactor.core.publisher.Mono;
 import top.starrysea.vo.SearchResource;
@@ -11,7 +12,7 @@ import top.starrysea.vo.SearchResource;
 public class KeywordChain {
 
 	private String keyword;
-	private KeywordFilter keywordFilter;
+	private Function<String, Set<String>> keywordFilter;
 
 	private final Consumer<? super SearchResource> timeKeyword = searchResource -> {
 		if (isValid("time")) {
@@ -26,11 +27,11 @@ public class KeywordChain {
 	};
 
 	private boolean isValid(String type) {
-		Set<String> validResource = keywordFilter.hasKeyword(keyword);
+		Set<String> validResource = keywordFilter.apply(keyword);
 		return validResource.contains(type);
 	}
 
-	public static Mono<SearchResource> startKeywordChain(String keyword, KeywordFilter keywordFilter) {
+	public static Mono<SearchResource> startKeywordChain(String keyword, Function<String, Set<String>> keywordFilter) {
 		KeywordChain keywordChain = new KeywordChain();
 		keywordChain.keyword = keyword;
 		keywordChain.keywordFilter = keywordFilter;

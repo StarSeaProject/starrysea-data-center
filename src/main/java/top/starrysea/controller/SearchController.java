@@ -25,7 +25,7 @@ public class SearchController {
 
 	@GetMapping("/search/{keyword}")
 	public Mono<SearchResource> search(@PathVariable("keyword") String keyword) {
-		return KeywordChain.startKeywordChain(keyword, keywordFilter);
+		return KeywordChain.startKeywordChain(keyword, keywordFilter::hasKeyword);
 	}
 
 	@GetMapping("/date/{year}/{month}")
