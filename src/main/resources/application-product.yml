@@ -17,3 +17,5 @@ starrysea:
     input: chatHistory
     output: chatHistory/result
   bloomfile: filter
+server:
+  port: 8081
