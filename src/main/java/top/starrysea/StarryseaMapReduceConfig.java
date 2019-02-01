@@ -13,6 +13,7 @@ import top.starrysea.reducer.DayReducer;
 import top.starrysea.reducer.IdReducer;
 import top.starrysea.reducer.MonthReducer;
 import top.starrysea.reducer.YearReducer;
+import top.starrysea.reducer.YearRepeatReducer;
 import top.starrysea.repository.CountRepository;
 
 @Configuration
@@ -31,6 +32,8 @@ public class StarryseaMapReduceConfig {
 	private DayReducer dayReducer;
 	@Autowired
 	private YearReducer yearReducer;
+	@Autowired
+	private YearRepeatReducer yearRepeatReducer;
 
 	@Autowired
 	private IdMapper idMapper;
@@ -41,7 +44,7 @@ public class StarryseaMapReduceConfig {
 	public StarryseaMapReduceManager getStarryseaMapReduceManager(CountRepository countRepository) {
 		StarryseaMapReduceManager starryseaMapReduceManager = new StarryseaMapReduceManager(
 				StarryseaMapReduceConfiguration.of().input(inputPath).output(outputPath));
-		starryseaMapReduceManager.register(dateMapper, monthReducer, dayReducer, yearReducer);
+		starryseaMapReduceManager.register(dateMapper, monthReducer, dayReducer, yearReducer, yearRepeatReducer);
 		starryseaMapReduceManager.register(idMapper, idReducer);
 		starryseaMapReduceManager.run();
 		return starryseaMapReduceManager;

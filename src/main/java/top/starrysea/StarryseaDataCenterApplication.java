@@ -3,6 +3,11 @@ package top.starrysea;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.convert.DbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -28,4 +33,12 @@ public class StarryseaDataCenterApplication {
 		return new ReactiveRedisTemplate<>(reactiveRedisConnectionFactory, serializationContext);
 	}
 
+	@Bean
+	public MappingMongoConverter mongoConverter(MongoDbFactory mongoFactory, MongoMappingContext mongoMappingContext)
+			throws Exception {
+		DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoFactory);
+		MappingMongoConverter mongoConverter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
+		mongoConverter.setMapKeyDotReplacement(".");
+		return mongoConverter;
+	}
 }
