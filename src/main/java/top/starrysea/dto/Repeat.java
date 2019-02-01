@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 public class Repeat {
 	
 	@Id
-	private String time;
+	private String id;
 	private Map<String, Long> result;
 
 	public Map<String, Long> getResult() {
@@ -18,12 +18,12 @@ public class Repeat {
 		this.result = result;
 	}
 
-	public String getTime() {
-		return time;
+	public String getId() {
+		return id;
 	}
 
-	public void setTime(String time) {
-		this.time = time;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 }

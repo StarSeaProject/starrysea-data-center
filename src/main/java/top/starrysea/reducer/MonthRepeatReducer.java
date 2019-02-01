@@ -20,7 +20,7 @@ import top.starrysea.mapreduce.reducer.MapLongReducer;
 import top.starrysea.repository.RepeatRepository;
 
 @Component
-public class YearRepeatReducer extends MapLongReducer {
+public class MonthRepeatReducer extends MapLongReducer {
 
 	@Autowired
 	private RepeatRepository repeatRepository;
@@ -44,7 +44,7 @@ public class YearRepeatReducer extends MapLongReducer {
 			}
 		}
 		String date = path.getName();
-		date = date.substring(0, date.indexOf('-'));
+		date = date.substring(0, date.lastIndexOf('-'));
 		return ReduceResult.of(date, theResult);
 	}
 
@@ -56,7 +56,7 @@ public class YearRepeatReducer extends MapLongReducer {
 			repeat.setResult(entry.getValue());
 			repeatRepository.save(repeat).subscribe();
 		}
-		logger.info("每年复读统计已存入数据库.");
+		logger.info("每月复读统计已存入数据库.");
 	}
 
 }
