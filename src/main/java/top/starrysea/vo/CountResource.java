@@ -2,6 +2,7 @@ package top.starrysea.vo;
 
 import top.starrysea.controller.SearchController;
 import top.starrysea.dto.Count;
+import top.starrysea.hateoas.RelType;
 import top.starrysea.hateoas.Resource;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class CountResource extends Resource {
 		this.resultList = Count.mapToList(this.result);
 		Map<String, String> inArg = new HashMap<>();
 		inArg.put("year", year);
-		this.addLink(linkTo(SearchController.class, "searchCountByYear", inArg, null,"prev"));
+		this.addLink(linkTo(SearchController.class, "searchCountByYear", inArg, null, RelType.PREV));
 	}
 
 	private CountResource(Count search, String year) {
@@ -35,7 +36,7 @@ public class CountResource extends Resource {
 		});
 		this.resultList = Count.mapToList(this.result);
 		inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByMonth", m, null)));
-		this.addLink(linkTo(SearchController.class, "searchCount", null, null, "prev"));
+		this.addLink(linkTo(SearchController.class, "searchCount", null, null, RelType.PREV));
 	}
 
 	private CountResource(Count search) {
