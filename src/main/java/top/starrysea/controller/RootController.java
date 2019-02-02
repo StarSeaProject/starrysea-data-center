@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import top.starrysea.vo.RootResource;
 
 @RestController
-@RequestMapping("/sdc")
+@RequestMapping("/sdc/api")
 public class RootController {
 
 	@GetMapping("")

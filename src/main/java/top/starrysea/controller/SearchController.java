@@ -15,7 +15,7 @@ import top.starrysea.vo.CountResource;
 import top.starrysea.vo.SearchResource;
 
 @RestController
-@RequestMapping("/sdc")
+@RequestMapping("/sdc/api")
 public class SearchController {
 
 	@Autowired

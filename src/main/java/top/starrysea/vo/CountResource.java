@@ -18,6 +18,9 @@ public class CountResource extends Resource {
 		this.type = search.getType();
 		this.result = search.getResult();
 		this.resultList = Count.mapToList(this.result);
+		Map<String, String> inArg = new HashMap<>();
+		inArg.put("year", year);
+		this.addLink(linkTo(SearchController.class, "searchCountByYear", inArg, null,"prev"));
 	}
 
 	private CountResource(Count search, String year) {
@@ -32,6 +35,7 @@ public class CountResource extends Resource {
 		});
 		this.resultList = Count.mapToList(this.result);
 		inArgList.forEach(m -> this.addLink(linkTo(SearchController.class, "searchCountByMonth", m, null)));
+		this.addLink(linkTo(SearchController.class, "searchCount", null, null, "prev"));
 	}
 
 	private CountResource(Count search) {
