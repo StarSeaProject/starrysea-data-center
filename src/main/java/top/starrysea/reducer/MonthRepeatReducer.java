@@ -54,7 +54,10 @@ public class MonthRepeatReducer extends MapLongReducer {
 			Repeat repeat = new Repeat();
 			repeat.setId(entry.getKey());
 			repeat.setResult(entry.getValue());
-			repeatRepository.save(repeat).subscribe();
+			repeatRepository.findById(entry.getKey()).defaultIfEmpty(repeat).subscribe(repeatTemp -> {
+				repeatTemp.getResult().putAll(entry.getValue());
+				repeatRepository.save(repeatTemp).subscribe();
+			});
 		}
 		logger.info("每月复读统计已存入数据库.");
 	}
