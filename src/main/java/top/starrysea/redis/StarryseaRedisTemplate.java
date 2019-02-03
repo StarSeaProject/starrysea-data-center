@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 public class StarryseaRedisTemplate<T> {
 
-	private ReactiveRedisTemplate<String, T> reactiveRedisTemplate;
+	protected ReactiveRedisTemplate<String, T> reactiveRedisTemplate;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public StarryseaRedisTemplate(ReactiveRedisConnectionFactory reactiveRedisConnectionFactory) {
@@ -37,7 +37,11 @@ public class StarryseaRedisTemplate<T> {
 		return reactiveRedisTemplate.opsForValue().set(key, value, timeout);
 	}
 
-	public Mono<Long> del(String... keys) {
-		return reactiveRedisTemplate.delete(keys);
+	public Mono<Boolean> del(String key) {
+		return reactiveRedisTemplate.opsForValue().delete(key);
+	}
+	
+	public Mono<Boolean> hasKey(String key){
+		return reactiveRedisTemplate.hasKey(key);
 	}
 }
