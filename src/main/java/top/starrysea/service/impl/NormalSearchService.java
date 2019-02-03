@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Mono;
 import top.starrysea.dto.Count;
+import top.starrysea.redis.CountTemplate;
 import top.starrysea.repository.CountRepository;
 import top.starrysea.service.ISearchService;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -17,9 +19,14 @@ public class NormalSearchService implements ISearchService {
 	@Autowired
 	private CountRepository countRepository;
 
+	@Autowired
+	private CountTemplate countTemplate;
+
 	@Override
 	public Mono<Count> searchCountServiceByMonth(String year,String month) {
-		return countRepository.findById("day").doOnNext(c -> {
+		Mono<Count> countMono = countTemplate.get("day");
+		return countMono.switchIfEmpty(countRepository.findById("day")).doOnNext(c -> {
+			countTemplate.set("day", c, Duration.ofHours(1)).subscribe();
 			String keyword = year + "-" + month + "-";
 			Map<String, Long> newResult = new TreeMap<>();
 			//使用TreeMap自动排序,下同
@@ -34,7 +41,9 @@ public class NormalSearchService implements ISearchService {
 
 	@Override
 	public Mono<Count> searchCountServiceByYear(String year) {
-		return countRepository.findById("month").doOnNext(c -> {
+		Mono<Count> countMono = countTemplate.get("month");
+		return countMono.switchIfEmpty(countRepository.findById("month")).doOnNext(c -> {
+			countTemplate.set("month", c, Duration.ofHours(1)).subscribe();
 			String keyword = year + "-";
 			Map<String, Long> newResult = new TreeMap<>();
 			c.getResult().forEach((key, value) -> {
@@ -48,7 +57,9 @@ public class NormalSearchService implements ISearchService {
 
 	@Override
 	public Mono<Count> searchCountService() {
-		return countRepository.findById("year").doOnNext(c->{
+		Mono<Count> countMono = countTemplate.get("year");
+		return countMono.switchIfEmpty(countRepository.findById("year")).doOnNext(c -> {
+			countTemplate.set("year", c, Duration.ofHours(1)).subscribe();
 			Map<String, Long> newResult = new TreeMap<>();
 			c.getResult().forEach(newResult::put);
 			c.setResult(newResult);
