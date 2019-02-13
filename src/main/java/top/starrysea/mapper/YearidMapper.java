@@ -17,7 +17,7 @@ public class YearidMapper extends Mapper {
 
 	@Override
 	protected String outputFileSubType() {
-		return "byDateandId";
+		return "byDateAndId";
 	}
 
 }
