@@ -57,7 +57,7 @@ public class StarryseaMapReduceConfig {
 		starryseaMapReduceManager.register(dateMapper, monthReducer, dayReducer, yearReducer, yearRepeatReducer,
 				monthRepeatReducer, dayRepeatReducer);
 		starryseaMapReduceManager.register(idMapper, idReducer);
-		starryseaMapReduceManager.register(yearidMapper, yearReducer, idReducer);
+		starryseaMapReduceManager.register(yearidMapper);
 		starryseaMapReduceManager.run();
 		return starryseaMapReduceManager;
 	}
