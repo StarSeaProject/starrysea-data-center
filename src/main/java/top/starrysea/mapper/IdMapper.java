@@ -7,17 +7,15 @@ import top.starrysea.mapreduce.MapReduceContext;
 import top.starrysea.mapreduce.Mapper;
 
 @Component
-public class DateMapper extends Mapper {
+public class IdMapper extends Mapper {
 
 	@Override
 	protected MapReduceContext map(SingleMessage singleMessage, MapReduceContext context) {
-		return context.write(singleMessage.getYear() + "-" + singleMessage.getMonth() + "-" + singleMessage.getDay(),
-				singleMessage);
+		return context.write(singleMessage.getId(), singleMessage);
 	}
 
 	@Override
 	protected String outputFileSubType() {
-		return "byDate";
+		return "byId";
 	}
-
 }

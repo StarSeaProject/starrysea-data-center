@@ -3,4 +3,19 @@ logging:
 spring:
   data:
     mongodb:
-      uri: mongodb://root:root1@127.0.0.1:27017/starrysea
+      username: root
+      password: root1
+      host: 127.0.0.1
+      port: 27017
+      database: starrysea
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: root1
+starrysea:
+  split:
+    input: chatHistory
+    output: chatHistory/result
+  bloomfile: filter
+server:
+  port: 8081

@@ -1,10 +1,21 @@
-logging: 
+logging:
   config: classpath:logback-dev.xml
 spring:
   data:
     mongodb:
-      uri: mongodb://root:root1@120.79.145.235:27017/starrysea
+      username: developer
+      password: developer
+      host: 120.79.145.235
+      port: 27017
+      database: starrysea-test
+  redis:
+    host: 120.79.145.235
+    port: 6379
+    password: root1
 starrysea:
   split:
     input: D:/chatHistory/raw
     output: D:/chatHistory/result
+  bloomfile: D:/chatHistory/filterlist.txt
+server:
+  port: 8081

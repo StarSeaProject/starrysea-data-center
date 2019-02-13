@@ -3,9 +3,9 @@ package top.starrysea.repository;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
-import top.starrysea.dto.Most;
+import top.starrysea.dto.Repeat;
 
 @Repository
-public interface MostRepository extends ReactiveMongoRepository<Most, String> {
+public interface RepeatRepository extends ReactiveMongoRepository<Repeat, String> {
 
 }
