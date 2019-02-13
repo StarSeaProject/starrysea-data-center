@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import top.starrysea.mapper.DateMapper;
 import top.starrysea.mapper.IdMapper;
+import top.starrysea.mapper.YearidMapper;
 import top.starrysea.mapreduce.StarryseaMapReduceConfiguration;
 import top.starrysea.mapreduce.StarryseaMapReduceManager;
 import top.starrysea.reducer.DayReducer;
@@ -45,6 +46,9 @@ public class StarryseaMapReduceConfig {
 	private IdMapper idMapper;
 	@Autowired
 	private IdReducer idReducer;
+	
+	@Autowired
+	private YearidMapper yearidMapper;
 
 	@Bean
 	public StarryseaMapReduceManager getStarryseaMapReduceManager(CountRepository countRepository) {
@@ -53,6 +57,7 @@ public class StarryseaMapReduceConfig {
 		starryseaMapReduceManager.register(dateMapper, monthReducer, dayReducer, yearReducer, yearRepeatReducer,
 				monthRepeatReducer, dayRepeatReducer);
 		starryseaMapReduceManager.register(idMapper, idReducer);
+		starryseaMapReduceManager.register(yearidMapper);
 		starryseaMapReduceManager.run();
 		return starryseaMapReduceManager;
 	}
