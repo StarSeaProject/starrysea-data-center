@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Mono;
+import top.starrysea.common.RedisOperations;
 import top.starrysea.dto.Count;
 import top.starrysea.redis.CountTemplate;
 import top.starrysea.repository.CountRepository;
 import top.starrysea.service.ISearchService;
 
-import java.time.Duration;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,8 +24,7 @@ public class NormalSearchService implements ISearchService {
 
 	@Override
 	public Mono<Count> searchCountServiceByMonth(String year,String month) {
-		Mono<Count> countMono = countTemplate.get("day");
-		return countMono.switchIfEmpty(countRepository.findById("day").doOnNext(c -> countTemplate.set("day", c, Duration.ofHours(1)).subscribe())).doOnNext(c -> {
+		return RedisOperations.getMono(countRepository, countTemplate, "day", c -> {
 			String keyword = year + "-" + month + "-";
 			Map<String, Long> newResult = new TreeMap<>();
 			//使用TreeMap自动排序,下同
@@ -40,8 +39,7 @@ public class NormalSearchService implements ISearchService {
 
 	@Override
 	public Mono<Count> searchCountServiceByYear(String year) {
-		Mono<Count> countMono = countTemplate.get("month");
-		return countMono.switchIfEmpty(countRepository.findById("month").doOnNext(c -> countTemplate.set("month", c, Duration.ofHours(1)).subscribe())).doOnNext(c -> {
+		return RedisOperations.getMono(countRepository, countTemplate, "month", c -> {
 			String keyword = year + "-";
 			Map<String, Long> newResult = new TreeMap<>();
 			c.getResult().forEach((key, value) -> {
@@ -55,8 +53,7 @@ public class NormalSearchService implements ISearchService {
 
 	@Override
 	public Mono<Count> searchCountService() {
-		Mono<Count> countMono = countTemplate.get("year");
-		return countMono.switchIfEmpty(countRepository.findById("year").doOnNext(c -> countTemplate.set("year", c, Duration.ofHours(1)).subscribe())).doOnNext(c -> {
+		return RedisOperations.getMono(countRepository, countTemplate, "year", c -> {
 			Map<String, Long> newResult = new TreeMap<>();
 			c.getResult().forEach(newResult::put);
 			c.setResult(newResult);
