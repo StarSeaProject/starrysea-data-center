@@ -33,7 +33,7 @@ public class Count {
         List<Map<String, Object>> list = new ArrayList<>();
         map.forEach((key,value)->{
             Map<String, Object> item = new HashMap<>();
-            item.put("date",key);
+            item.put("index",key);
             item.put("result",value);
             list.add(item);
         });
