@@ -22,7 +22,7 @@ public class KeywordChain {
 
 	private final Consumer<? super SearchResource> idKeyword = searchResource -> {
 		if (isValid("id")) {
-			searchResource.addDateSearchLink();
+			searchResource.addIdSearchLink();
 		}
 	};
 

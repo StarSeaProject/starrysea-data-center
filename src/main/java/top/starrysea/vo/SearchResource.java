@@ -8,5 +8,7 @@ public class SearchResource extends Resource{
 	public void addDateSearchLink() {
 		this.addLink(linkTo(SearchController.class, "searchCount"));
 	}
-	
+	public void addIdSearchLink(){
+		this.addLink(linkTo(SearchController.class, "searchIdCount"));
+	}
 }
