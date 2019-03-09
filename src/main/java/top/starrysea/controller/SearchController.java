@@ -12,6 +12,7 @@ import top.starrysea.keyword.KeywordChain;
 import top.starrysea.keyword.KeywordFilter;
 import top.starrysea.service.ISearchService;
 import top.starrysea.vo.CountResource;
+import top.starrysea.vo.IdCountResource;
 import top.starrysea.vo.SearchResource;
 
 @RestController
@@ -45,5 +46,11 @@ public class SearchController {
 	public Mono<CountResource> searchCount() {
 		Mono<Count> serviceResult = searchService.searchCountService();
 		return serviceResult.map(CountResource::of);
+	}
+
+	@GetMapping("/id")
+	public Mono<IdCountResource> searchIdCount() {
+		Mono<Count> serviceResult = searchService.searchCountServiceById();
+		return serviceResult.map(IdCountResource::of);
 	}
 }

@@ -10,6 +10,7 @@ import top.starrysea.redis.CountTemplate;
 import top.starrysea.repository.CountRepository;
 import top.starrysea.service.ISearchService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -58,5 +59,16 @@ public class NormalSearchService implements ISearchService {
 			c.getResult().forEach(newResult::put);
 			c.setResult(newResult);
 		});
+	}
+	@Override
+    public Mono<Count> searchCountServiceById() {
+        return RedisOperations.getMono(countRepository, countTemplate, "userId", c -> {
+            Map<String, Long> newResult = new HashMap<>();
+            c.getResult().forEach((s, l) -> {
+                s = s.replace('^', '.');
+                newResult.put(s, l);
+            });
+            c.setResult(newResult);
+        });
 	}
 }
